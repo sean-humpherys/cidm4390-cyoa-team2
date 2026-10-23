@@ -1,3 +1,4 @@
+namespace CYOA;
 public class Dragon
 {
     public string DragonName { get; set; }
