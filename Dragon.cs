@@ -1,27 +1,28 @@
+namespace CYOA;
 public class Dragon
 {
-    public string Name { get; set; }
-    public int Strength { get; set; }
-    public int Health { get; set; }
-    public int Agility { get; set; }
-    public string Weapon { get; set; }
+    public string DragonName { get; set; }
+    public int DragonStrength { get; set; }
+    public int DragonHealth { get; set; }
+    public int DragonAgility { get; set; }
+    public string DragonWeapon { get; set; }
 
-    public Dragon(string name)
+    public Dragon(string dragonName)
     {
-        Name = name;
-        Strength = 15;
-        Health = 100;
-        Agility = 10;
-        Weapon = "Fire Breath";
+        DragonName = dragonName;
+        DragonStrength = 15;
+        DragonHealth = 100;
+        DragonAgility = 10;
+        DragonWeapon = "Fire Breath";
     }
 
     public string DisplayStats()
     {
         return "--- Dragon Statistics ---\n" +
-               $"Name: {Name}\n" +
-               $"Strength: {Strength}\n" +
-               $"Health: {Health}\n" +
-               $"Agility: {Agility}\n" +
-               $"Weapon: {Weapon}";
+               $"Name: {DragonName}\n" +
+               $"Strength: {DragonStrength}\n" +
+               $"Health: {DragonHealth}\n" +
+               $"Agility: {DragonAgility}\n" +
+               $"Weapon: {DragonWeapon}";
     }
 }
