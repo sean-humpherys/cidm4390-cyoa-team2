@@ -14,8 +14,7 @@ public class Messages
     }
 
     /// <summary>
-    /// Throws ArgumentException on a null/empty path, FileNotFoundException if the file is missing,
-    /// FormatException on a malformed line.
+ 
     /// </summary>
     public void ReadDictionary(string languageFilePath)
     {
