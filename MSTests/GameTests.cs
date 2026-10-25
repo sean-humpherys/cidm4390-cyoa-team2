@@ -22,16 +22,16 @@ public class GameTests
             $"4={Goodbye}\n" +
             $"5={Welcome}\n" +
             $"6={MenuPrompt}\n" +
-            "20=Retreat\n" +
-            "21=Victory\n" +
-            "22=Defeat\n" +
-            "30=Path prompt\n" +
-            "31=North path\n" +
-            "32=South path\n" +
-            "33=I am {0}\n" +
-            "34=Magic ring\n" +
-            "35=Fight prompt\n" +
-            "36=Invalid adventure choice\n");
+            $"{Game.RetreatMessageId}=Retreat\n" +
+            $"{Game.DragonDefeatedMessageId}=Victory\n" +
+            $"{Game.PlayerDefeatedMessageId}=Defeat\n" +
+            $"{Game.PathPromptMessageId}=Path prompt\n" +
+            $"{Game.NorthPathMessageId}=North path\n" +
+            $"{Game.SouthPathMessageId}=South path\n" +
+            $"{Game.DragonSaysMessageId}=I am {{dragonName}}\n" +
+            $"{Game.MagicRingMessageId}=Magic ring\n" +
+            $"{Game.RetreatOrAttackPromptMessageId}=Fight prompt\n" +
+            $"{Game.InvalidAdventureChoiceMessageId}=Invalid adventure choice\n");
         _messages = new Messages();
         _messages.ReadDictionary(_messageFile);
     }
@@ -39,7 +39,10 @@ public class GameTests
     [TestCleanup]
     public void Cleanup() => File.Delete(_messageFile);
 
+    // ---------------------------------------------------------------
     // Helpers
+    // ---------------------------------------------------------------
+
     private static string[] SplitLines(string text) =>
         text.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
 
@@ -90,7 +93,9 @@ public class GameTests
         return (output.ToString(), attackCalls);
     }
 
+    // ---------------------------------------------------------------
     // Game initialization and main menu
+    // ---------------------------------------------------------------
 
     [TestMethod]
     public void DiceAndDragonAreInstantiatedOnStart()
@@ -193,7 +198,9 @@ public class GameTests
         Assert.Fail("Expected EndOfStreamException.");
     }
 
+    // ---------------------------------------------------------------
     // End Game
+    // ---------------------------------------------------------------
 
     [TestMethod]
     [DataRow(EndCondition.CharacterRetreats, "Retreat")]
@@ -211,7 +218,9 @@ public class GameTests
         Assert.AreEqual(expected, lines[0]);
     }
 
+    // ---------------------------------------------------------------
     // Start Adventure (path choice, dragon encounter, retreat or attack)
+    // ---------------------------------------------------------------
 
     [TestMethod]
     public void NorthPathShowsNorthMessageThenDragonEncounter()
@@ -226,11 +235,24 @@ public class GameTests
     }
 
     [TestMethod]
-    public void SouthPathShowsSouthMessageThenDragonEncounter()
+    public void SouthPathShowsSouthMessageThenReturnsToPathPrompt()
     {
-        var (output, _) = RunAdventure("s\nr\n");
-        StringAssert.Contains(output, "South path");
+        var (output, attackCalls) = RunAdventure("s\ne\n");
+        Assert.AreEqual(1, CountText(output, "South path"));
+        Assert.AreEqual(2, CountText(output, "Path prompt"));
         Assert.IsFalse(output.Contains("North path"));
+        Assert.IsFalse(output.Contains("I am Smaug"));
+        Assert.AreEqual(1, CountText(output, Goodbye));
+        Assert.AreEqual(0, attackCalls);
+    }
+
+    [TestMethod]
+    public void SouthThenNorthContinuesToDragonEncounter()
+    {
+        var (output, _) = RunAdventure("s\nn\nr\n");
+        Assert.AreEqual(1, CountText(output, "South path"));
+        Assert.AreEqual(2, CountText(output, "Path prompt"));
+        StringAssert.Contains(output, "North path");
         StringAssert.Contains(output, "I am Smaug");
     }
 

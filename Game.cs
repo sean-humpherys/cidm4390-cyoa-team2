@@ -1,14 +1,9 @@
-using System;
-using System.IO;
-using CYOA;
-
 namespace CYOA;
 
 public class Game
 {
     public const string InvalidChoiceMessage = "Invalid choice. Type '1' or '2'.";
 
-    // The design documents do not define the dragon's name. Placeholder.
     public const string DefaultDragonName = "Dragon";
 
     private readonly Messages _messages;
@@ -16,8 +11,8 @@ public class Game
     private readonly TextReader _input;
     private readonly TextWriter _output;
     private readonly Action<Dice> _createPlayer;
+    private readonly Dragon? _initialDragon;
 
-    // Set when the game starts. Exposed so tests and later flows can reuse them.
     public Dice? Dice { get; private set; }
     public Dragon? Dragon { get; private set; }
     public Character? Player { get; private set; }
@@ -32,6 +27,7 @@ public class Game
     {
         Dice = dice;
         Dragon = dragon;
+        _initialDragon = dragon;
         _loadMessagesFromFile = messages == null;
         _messages = messages ?? new Messages();
         _input = input ?? Console.In;
@@ -48,7 +44,8 @@ public class Game
 
         Dice dice = Dice ?? new Dice();
         Dice = dice;
-        Dragon = Dragon ?? new Dragon(DefaultDragonName);
+        Dragon = _initialDragon ?? new Dragon(DefaultDragonName);
+        Player = null;
 
         _output.WriteLine(_messages.GetMessage(5));
 
@@ -80,33 +77,45 @@ public class Game
         }
     }
 
-    public const int PathPromptMessageId = 30;
-    public const int NorthPathMessageId = 31;
-    public const int SouthPathMessageId = 32;
-    public const int DragonSaysMessageId = 33;      // contains {0} for the dragon's name
-    public const int MagicRingMessageId = 34;
-    public const int RetreatOrAttackPromptMessageId = 35;
-    public const int InvalidAdventureChoiceMessageId = 36;
+    public const int PathPromptMessageId = 7;
+    public const int NorthPathMessageId = 9;
+    public const int SouthPathMessageId = 8;
+    public const int DragonSaysMessageId = 10;      
+    public const int MagicRingMessageId = 11;
+    public const int RetreatOrAttackPromptMessageId = 12;
+    public const int InvalidAdventureChoiceMessageId = 52;
+
     public void StartAdventure(Action startAttack)
     {
         Dragon dragon = Dragon ?? throw new InvalidOperationException(
             "The game has not been started, so there is no dragon.");
 
-        string pathChoice = ReadChoice(PathPromptMessageId, "n", "s", "e");
+        string pathChoice;
+        while (true)
+        {
+            pathChoice = ReadChoice(PathPromptMessageId, "n", "s", "e");
+            if (pathChoice != "s")
+            {
+                break;
+            }
+
+            _output.WriteLine(_messages.GetMessage(SouthPathMessageId));
+        }
+
         if (pathChoice == "e")
         {
             EndGame();
             return;
         }
 
-        _output.WriteLine(_messages.GetMessage(
-            pathChoice == "n" ? NorthPathMessageId : SouthPathMessageId));
+        _output.WriteLine(_messages.GetMessage(NorthPathMessageId));
 
         Console.ForegroundColor = ConsoleColor.Red;
         try
         {
-            _output.WriteLine(string.Format(
-                _messages.GetMessage(DragonSaysMessageId), dragon.DragonName));
+            _output.WriteLine(Format(
+                _messages.GetMessage(DragonSaysMessageId),
+                ("dragonName", dragon.DragonName)));
         }
         finally
         {
@@ -124,6 +133,15 @@ public class Game
         }
 
         startAttack();
+    }
+
+    private static string Format(string template, params (string Key, string Value)[] values)
+    {
+        foreach (var (key, value) in values)
+        {
+            template = template.Replace("{" + key + "}", value);
+        }
+        return template;
     }
 
     private string ReadChoice(int promptMessageId, params string[] validChoices)
@@ -148,15 +166,15 @@ public class Game
             _output.WriteLine(_messages.GetMessage(InvalidAdventureChoiceMessageId));
         }
     }
-
-    public const int RetreatMessageId = 20;
-    public const int DragonDefeatedMessageId = 21;
-    public const int PlayerDefeatedMessageId = 22;
+    public const int RetreatMessageId = 41;
+    public const int DragonDefeatedMessageId = 42;
+    public const int PlayerDefeatedMessageId = 43;
 
     public void EndGame()
     {
         _output.WriteLine(_messages.GetMessage(4));
     }
+
 
     public void EndGame(EndCondition condition)
     {
@@ -169,6 +187,63 @@ public class Game
         };
 
         _output.WriteLine(_messages.GetMessage(messageId));
+    }
+
+    public const int AttackIntroMessageId = 20;        // {occupation}, {weapon}
+    public const int AttackPromptMessageId = 25;
+    public const int AttackRetreatMessageId = 26;
+    public const int FighterArtMessageId = 53;
+    public const int MagicianArtMessageId = 54;
+    public const int ThiefArtMessageId = 55;
+    public const int ArcherArtMessageId = 56;
+
+    public bool StartAttack(Combat combat)
+    {
+        Character player = Player ?? throw new InvalidOperationException(
+            "There is no character. Create one before attacking.");
+        Dragon dragon = Dragon ?? throw new InvalidOperationException(
+            "The game has not been started, so there is no dragon.");
+
+        _output.WriteLine(Format(
+            _messages.GetMessage(AttackIntroMessageId),
+            ("occupation", player.Occupation),
+            ("weapon", player.Weapon)));
+
+        int? artMessageId = player.Occupation switch
+        {
+            "Fighter" => FighterArtMessageId,
+            "Magician" => MagicianArtMessageId,
+            "Thief" => ThiefArtMessageId,
+            "Archer" => ArcherArtMessageId,
+            _ => null
+        };
+        if (artMessageId != null)
+        {
+            _output.WriteLine(_messages.GetMessage(artMessageId.Value));
+        }
+
+        while (true)
+        {
+            combat.PlayerAttack(player, dragon);
+            if (dragon.DragonHealth <= 0)
+            {
+                EndGame(EndCondition.DragonDefeated);
+                return false;
+            }
+
+            combat.DragonAttack(dragon, player);
+            if (player.Health <= 0)
+            {
+                EndGame(EndCondition.PlayerDefeated);
+                return false;
+            }
+
+            if (ReadChoice(AttackPromptMessageId, "r", "a") == "r")
+            {
+                _output.WriteLine(_messages.GetMessage(AttackRetreatMessageId));
+                return true;
+            }
+        }
     }
 
     private void LoadDefaultMessages()
@@ -216,8 +291,9 @@ public class Game
 
         return null;
     }
+
     private void CreatePlayer(Dice dice)
     {
-        Player = Character.Create();
+        Player = Character.Create(_input, _output, null, _messages);
     }
 }

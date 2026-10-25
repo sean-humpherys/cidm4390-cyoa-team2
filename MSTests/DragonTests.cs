@@ -11,7 +11,7 @@ public class DragonTests
     {
         var dragon = new Dragon("Ember");
 
-        Assert.AreEqual("Ember", dragon.Name);
+        Assert.AreEqual("Ember", dragon.DragonName);
     }
 
     [TestMethod]
@@ -19,10 +19,10 @@ public class DragonTests
     {
         var dragon = new Dragon("Ember");
 
-        Assert.AreEqual(15, dragon.Strength);
-        Assert.AreEqual(100, dragon.Health);
-        Assert.AreEqual(10, dragon.Agility);
-        Assert.AreEqual("Fire Breath", dragon.Weapon);
+        Assert.AreEqual(15, dragon.DragonStrength);
+        Assert.AreEqual(100, dragon.DragonHealth);
+        Assert.AreEqual(10, dragon.DragonAgility);
+        Assert.AreEqual("Fire Breath", dragon.DragonWeapon);
     }
 
     [TestMethod]

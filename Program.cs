@@ -1,2 +1,9 @@
-﻿// See https://aka.ms/new-console-template for more information
-Console.WriteLine("Hello, World!");
+﻿using CYOA;
+
+var game = new Game();
+game.StartGame();
+
+if (game.Player != null)
+{
+    game.StartAdventure(() => game.StartAttack(new Combat()));
+}

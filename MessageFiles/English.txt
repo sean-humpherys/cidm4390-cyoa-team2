@@ -1,0 +1,81 @@
+# GENERAL / TEST MESSAGES
+1=Welcome to the game!
+2=Choose your character.
+3=Game over!
+
+# START GAME ACTIVITY
+4=Adventure ends. Bye.
+5=Welcome to Choose Your Adventure Game
+6=Choose: 1. Create Character or 2. Exit. Type '1' or '2'
+7=You are walking in the mountains. You see two paths, one leading north and higher into the mountains. The other path leads south and into the woods. Enter 'n' for North. Enter 's' for South. Enter 'e' for exit game.
+8=You take the South path. After many long days, nothing adventurous happens. You are bored and return home, poor, and still bored.
+9=You take the North path. After walking for hours, the air grows colder, and the trees become more sparse. You are confronted with a dragon. The dragon has a hoard of gold behind it.
+10=The dragon says 'I am {dragonName}. Leave or perish!'
+11=Your magic ring gives you the stats on the dragon.
+12=Do you wish to retreat or attack? Enter 'r' for retreat. Enter 'a' for attack.
+
+# CREATE CHARACTER ACTIVITY
+13=What race of character do you want to be? Human, Elf, Dwarf or Halfling?
+14=What is the name of your character?
+15=What is the occupation of your character? Fighter, magician, thief, or archer?
+16=Next, we are going to roll for strength. Type 'roll'
+17=Next, we will roll for agility. Type 'roll'
+18=Next, we will roll for health points. Type 'roll'
+19=What would you like to do next? 1. List character stats 2. Proceed on an adventure. Type 1 or 2.
+
+# ATTACK ACTIVITY
+20=You prepare yourself to attack the dragon with your weapon. As a {occupation} you withdraw your {weapon}. You attack.
+21=You hit {dragonName}.
+22={dragonName} successfully defends your attack.
+23=The dragon failed to defend your attack. Your weapon delivers {damage} damage points. The dragon's health points is now {healthPoints}.
+24=With the last words of 'Arggg!', you have defeated the dragon.
+25=Enter 'r' for retreat and 'a' for attack.
+26=You hastily retreat licking your wounds.
+
+# CHARACTER SUMMARY LABELS
+27=Name
+28=Race
+29=Occupation
+30=Strength
+31=Agility
+32=Health points
+33=Weapon
+34=Weapon's maximum damage points
+
+# ATTACK ACTIVITY - DRAGON COUNTERATTACK
+35=You missed {dragonName}.
+36={dragonName} has hit you.
+37=The dragon missed you.
+38=You successfully defended the attack.
+39=The dragon's attack delivers {damage} damage points. Your health points is now {healthPoints}.
+40=With the last words of 'Oh no!', you have been defeated by the dragon.
+
+# END GAME ACTIVITY
+41=You quickly retreat. You come home poor but alive to adventure another day. The End.
+42=With the dragon vanquished, you collect the horde of gold, return home, rich and famous. The End.
+43=The dragon laughs as your eyesight fades. You are defeated. Your family mourns their loss. The End.
+
+# DRAGON SARCASTIC REPLIES
+44=Ow! That actually stung a bit!
+45=Impressive! You might actually be worth toasting...
+46=That... was unexpected. But I assure you, it won't happen again.
+47=Well, I'll be! You have more bite than I thought!
+
+# DRAGON DEFENSE TAUNTS
+48=Missed me, breath of a gnat!
+49=Is that all you've got? I've seen kittens with more fire in their paws!
+50=Try harder, {race}! You're making me yawn!
+51=Maybe if you squinted harder, you'd actually hit something!
+
+# ADDED: ADVENTURE AND ATTACK SUPPORT (used by Game.cs)
+52=Invalid choice. Try again.
+53=-)=====>
+54=zap~~~~~~
+55=-)==>
+56=}     -->
+
+# ADDED: DRAGON REPLIES WHEN THE PLAYER SURVIVES A HIT (from the Attack diagram)
+57=How adorable. You're actually trying to win.
+58=You're still standing? Your persistence is almost as annoying as your sword.
+59=Still breathing? You really are a stubborn, aren't you?
+60=I'm genuinely impressed. Most people have the common sense to die much faster than this.
