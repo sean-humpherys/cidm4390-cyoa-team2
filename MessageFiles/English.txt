@@ -1,9 +1,4 @@
-# GENERAL / TEST MESSAGES
-1=Welcome to the game!
-2=Choose your character.
-3=Game over!
-
-# START GAME ACTIVITY
+# ACTIVITY: START GAME 
 4=Adventure ends. Bye.
 5=Welcome to Choose Your Adventure Game
 6=Choose: 1. Create Character or 2. Exit. Type '1' or '2'
@@ -14,7 +9,7 @@
 11=Your magic ring gives you the stats on the dragon.
 12=Do you wish to retreat or attack? Enter 'r' for retreat. Enter 'a' for attack.
 
-# CREATE CHARACTER ACTIVITY
+# ACTIVITY: CREATE CHARACTER 
 13=What race of character do you want to be? Human, Elf, Dwarf or Halfling?
 14=What is the name of your character?
 15=What is the occupation of your character? Fighter, magician, thief, or archer?
@@ -23,7 +18,7 @@
 18=Next, we will roll for health points. Type 'roll'
 19=What would you like to do next? 1. List character stats 2. Proceed on an adventure. Type 1 or 2.
 
-# ATTACK ACTIVITY
+# ACTIVITY: ATTACK 
 20=You prepare yourself to attack the dragon with your weapon. As a {occupation} you withdraw your {weapon}. You attack.
 21=You hit {dragonName}.
 22={dragonName} successfully defends your attack.
@@ -32,7 +27,7 @@
 25=Enter 'r' for retreat and 'a' for attack.
 26=You hastily retreat licking your wounds.
 
-# CHARACTER SUMMARY LABELS
+# CHARACTER STATS
 27=Name
 28=Race
 29=Occupation
@@ -42,7 +37,7 @@
 33=Weapon
 34=Weapon's maximum damage points
 
-# ATTACK ACTIVITY - DRAGON COUNTERATTACK
+# DRAGON COUNTERATTACK
 35=You missed {dragonName}.
 36={dragonName} has hit you.
 37=The dragon missed you.
@@ -50,12 +45,12 @@
 39=The dragon's attack delivers {damage} damage points. Your health points is now {healthPoints}.
 40=With the last words of 'Oh no!', you have been defeated by the dragon.
 
-# END GAME ACTIVITY
+# END GAME CONDITIONS
 41=You quickly retreat. You come home poor but alive to adventure another day. The End.
 42=With the dragon vanquished, you collect the horde of gold, return home, rich and famous. The End.
 43=The dragon laughs as your eyesight fades. You are defeated. Your family mourns their loss. The End.
 
-# DRAGON SARCASTIC REPLIES
+# DRAGON REPLIES
 44=Ow! That actually stung a bit!
 45=Impressive! You might actually be worth toasting...
 46=That... was unexpected. But I assure you, it won't happen again.
@@ -67,14 +62,14 @@
 50=Try harder, {race}! You're making me yawn!
 51=Maybe if you squinted harder, you'd actually hit something!
 
-# ADDED: ADVENTURE AND ATTACK SUPPORT (used by Game.cs)
+# ADVENTURE AND ATTACK SUPPORT 
 52=Invalid choice. Try again.
 53=-)=====>
 54=zap~~~~~~
 55=-)==>
 56=}     -->
 
-# ADDED: DRAGON REPLIES WHEN THE PLAYER SURVIVES A HIT (from the Attack diagram)
+# DRAGON REPLIES WHEN THE PLAYER SURVIVES A HIT 
 57=How adorable. You're actually trying to win.
 58=You're still standing? Your persistence is almost as annoying as your sword.
 59=Still breathing? You really are a stubborn, aren't you?
