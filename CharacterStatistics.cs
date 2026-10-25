@@ -1,4 +1,4 @@
-
+namespace CYOA;
 
 public static class CharacterStatistics
 {
