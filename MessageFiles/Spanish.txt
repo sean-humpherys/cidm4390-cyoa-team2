@@ -1,34 +1,33 @@
-
-# ACTIVIDAD: INICIO DEL JUEGO
+# ACTIVIDAD: INICIAR JUEGO
 4=La aventura termina. Adiós.
-5=Bienvenido al juego Elige Tu Aventura
+5=Bienvenido al juego Elige Tu Propia Aventura
 6=Elige: 1. Crear personaje o 2. Salir. Escribe '1' o '2'
-7=Caminas por las montañas. Ves dos caminos: uno va hacia el norte y sube más alto en las montañas, y el otro va hacia el sur y se adentra en el bosque. Escribe 'n' para ir al norte. Escribe 's' para ir al sur. Escribe 'e' para salir del juego.
-8=Tomas el camino del sur. Tras muchos días largos, no ocurre nada aventurero. Regresas a casa sin un centavo y con el mismo aburrimiento de siempre.
-9=Tomas el camino del norte. Después de caminar durante horas, el aire se vuelve más frío y los árboles se hacen más escasos. Te encuentras cara a cara con un dragón. El dragón tiene un tesoro de oro detrás de él.
+7=Caminas por las montañas. Ves dos caminos: uno va hacia el norte y sube más alto por las montañas. El otro va hacia el sur, hacia el bosque. Escribe 'n' para el norte. Escribe 's' para el sur. Escribe 'e' para salir del juego.
+8=Tomas el camino del sur. Después de muchos días largos, no sucede nada aventurero. Te aburres y regresas a casa, pobre y todavía aburrido.
+9=Tomas el camino del norte. Después de caminar durante horas, el aire se vuelve más frío y los árboles se hacen más escasos. Te encuentras con un dragón. El dragón tiene un tesoro de oro detrás de él.
 10=El dragón dice: 'Soy {dragonName}. ¡Vete o perece!'
 11=Tu anillo mágico te muestra las estadísticas del dragón.
-12=¿Quieres retirarte o atacar? Escribe 'r' para retirarte. Escribe 'a' para atacar.
+12=¿Deseas retirarte o atacar? Escribe 'r' para retirarte. Escribe 'a' para atacar.
 
-# ACTIVIDAD: CREACIÓN DE PERSONAJE
-13=¿Qué raza de personaje quieres ser? Human, Elf, Dwarf o Halfling
-14=¿Cómo se llama tu personaje?
-15=¿Cuál es la ocupación de tu personaje? Fighter, magician, thief o archer
-16=A continuación, vamos a tirar los dados para la fuerza. Escribe 'roll'
+# ACTIVIDAD: CREAR PERSONAJE
+13=¿Qué raza quieres que tenga tu personaje? Human, Elf, Dwarf o Halfling?
+14=¿Cuál es el nombre de tu personaje?
+15=¿Cuál es la ocupación de tu personaje? Fighter, magician, thief o archer?
+16=A continuación, tiraremos los dados para la fuerza. Escribe 'roll'
 17=A continuación, tiraremos los dados para la agilidad. Escribe 'roll'
 18=A continuación, tiraremos los dados para los puntos de salud. Escribe 'roll'
-19=¿Qué te gustaría hacer ahora? 1. Mostrar las estadísticas del personaje 2. Continuar con la aventura. Escribe 1 o 2.
+19=¿Qué te gustaría hacer ahora? 1. Ver las estadísticas del personaje 2. Continuar con la aventura. Escribe 1 o 2.
 
 # ACTIVIDAD: ATAQUE
 20=Te preparas para atacar al dragón con tu arma. Como {occupation}, sacas tu {weapon}. Atacas.
 21=Golpeas a {dragonName}.
 22={dragonName} defiende con éxito tu ataque.
-23=El dragón no logró defenderse de tu ataque. Tu arma inflige {damage} puntos de daño. Los puntos de salud del dragón ahora son {healthPoints}.
+23=El dragón no logró defenderse de tu ataque. Tu arma causa {damage} puntos de daño. Los puntos de salud del dragón ahora son {healthPoints}.
 24=Con las últimas palabras de '¡Arggg!', has derrotado al dragón.
 25=Escribe 'r' para retirarte y 'a' para atacar.
 26=Te retiras apresuradamente lamiéndote las heridas.
 
-# ETIQUETAS DEL RESUMEN DEL PERSONAJE
+# ESTADÍSTICAS DEL PERSONAJE
 27=Nombre
 28=Raza
 29=Ocupación
@@ -36,42 +35,42 @@
 31=Agilidad
 32=Puntos de salud
 33=Arma
-34=Puntos de daño máximo del arma
+34=Puntos máximos de daño del arma
 
-# ACTIVIDAD: ATAQUE - CONTRAATAQUE DEL DRAGÓN
-35=Fallaste el golpe contra {dragonName}.
+# CONTRAATAQUE DEL DRAGÓN
+35=Fallaste contra {dragonName}.
 36={dragonName} te ha golpeado.
-37=El dragón no te acertó.
-38=Te defendiste del ataque con éxito.
-39=El ataque del dragón inflige {damage} puntos de daño. Tus puntos de salud ahora son {healthPoints}.
-40=Con las últimas palabras de '¡Oh, no!', el dragón te ha derrotado.
+37=El dragón falló contra ti.
+38=Defendiste el ataque con éxito.
+39=El ataque del dragón causa {damage} puntos de daño. Tus puntos de salud ahora son {healthPoints}.
+40=Con las últimas palabras de '¡Ay, no!', has sido derrotado por el dragón.
 
-# ACTIVIDAD: FIN DEL JUEGO
-41=Te retiras rápidamente. Regresas a casa sin un centavo, pero con vida, para vivir otra aventura otro día. Fin.
-42=Con el dragón vencido, recoges el tesoro de oro y regresas a casa con riqueza y fama. Fin.
-43=El dragón se ríe mientras tu vista se apaga. Has perdido. Tu familia llora su pérdida. Fin.
+# CONDICIONES DE FIN DEL JUEGO
+41=Te retiras rápidamente. Llegas a casa pobre pero con vida para vivir otra aventura otro día. Fin.
+42=Con el dragón vencido, recoges el tesoro de oro y regresas a casa, rico y famoso. Fin.
+43=El dragón se ríe mientras tu vista se apaga. Has sido derrotado. Tu familia llora su pérdida. Fin.
 
-# RESPUESTAS SARCÁSTICAS DEL DRAGÓN
-44=¡Ay! ¡Eso sí que picó un poco!
-45=¡Impresionante! Puede que hasta valgas la pena para tostarte...
+# RESPUESTAS DEL DRAGÓN
+44=¡Ay! ¡Eso sí que dolió un poquito!
+45=¡Impresionante! Quizás merezcas un brindis...
 46=Eso... fue inesperado. Pero te aseguro que no volverá a pasar.
 47=¡Vaya, vaya! ¡Tienes más mordida de lo que pensaba!
 
-# BURLAS DEL DRAGÓN AL DEFENDERSE
+# BURLAS DEFENSIVAS DEL DRAGÓN
 48=¡Fallaste, aliento de mosquito!
 49=¿Eso es todo lo que tienes? ¡He visto gatitos con más fuego en las patas!
-50=¡Esfuérzate más, {race}! ¡Me estás haciendo bostezar!
-51=¡Si entrecerraras más los ojos, quizás le darías a algo!
+50=¡Esfuérzate más, {race}! ¡Me estás dando sueño!
+51=¡Quizás si entrecerraras más los ojos, de verdad le darías a algo!
 
-# AÑADIDOS: AVENTURA Y ATAQUE (usados por Game.cs)
+# APOYO DE AVENTURA Y ATAQUE
 52=Opción no válida. Inténtalo de nuevo.
 53=-)=====>
 54=zap~~~~~~
 55=-)==>
 56=}     -->
 
-# AÑADIDOS: RESPUESTAS DEL DRAGÓN CUANDO EL JUGADOR SOBREVIVE A UN GOLPE
+# RESPUESTAS DEL DRAGÓN CUANDO EL JUGADOR SOBREVIVE A UN GOLPE
 57=Qué adorable. De verdad estás intentando ganar.
-58=¿Sigues en pie? Tu perseverancia es casi tan molesta como tu espada.
-59=¿Sigues respirando? Qué terquedad la tuya, ¿eh?
-60=Estoy genuinamente impresionado. La mayoría de la gente tiene el sentido común de morir mucho más rápido que esto.
+58=¿Sigues en pie? Tu persistencia es casi tan molesta como tu espada.
+59=¿Sigues respirando? De verdad eres terco, ¿no?
+60=Estoy realmente impresionado. La mayoría tiene el sentido común de morir mucho más rápido que esto.
