@@ -1,0 +1,76 @@
+# ACTIVITÉ : DÉMARRER LE JEU
+4=L'aventure se termine. Au revoir.
+5=Bienvenue dans le jeu Choisissez Votre Aventure
+6=Choisissez : 1. Créer un personnage ou 2. Quitter. Tapez '1' ou '2'
+7=Vous marchez dans les montagnes. Vous voyez deux chemins : l'un monte vers le nord, plus haut dans les montagnes. L'autre mène vers le sud, dans les bois. Tapez 'n' pour le nord. Tapez 's' pour le sud. Tapez 'e' pour quitter le jeu.
+8=Vous prenez le chemin du sud. Après de longs jours, rien d'aventureux ne se produit. Vous vous ennuyez et rentrez chez vous, pauvre et toujours ennuyé.
+9=Vous prenez le chemin du nord. Après des heures de marche, l'air devient plus froid et les arbres se font plus rares. Vous vous retrouvez face à un dragon. Le dragon garde un trésor d'or derrière lui.
+10=Le dragon dit : 'Je suis {dragonName}. Partez ou périssez !'
+11=Votre anneau magique vous donne les statistiques du dragon.
+12=Voulez-vous battre en retraite ou attaquer ? Tapez 'r' pour battre en retraite. Tapez 'a' pour attaquer.
+
+# ACTIVITÉ : CRÉER UN PERSONNAGE
+13=Quelle race de personnage voulez-vous être ? Human, Elf, Dwarf ou Halfling ?
+14=Quel est le nom de votre personnage ?
+15=Quelle est l'occupation de votre personnage ? Fighter, magician, thief ou archer ?
+16=Ensuite, nous allons lancer les dés pour la force. Tapez 'roll'
+17=Ensuite, nous allons lancer les dés pour l'agilité. Tapez 'roll'
+18=Ensuite, nous allons lancer les dés pour les points de santé. Tapez 'roll'
+19=Que voulez-vous faire ensuite ? 1. Afficher les statistiques du personnage 2. Partir à l'aventure. Tapez 1 ou 2.
+
+# ACTIVITÉ : ATTAQUE
+20=Vous vous préparez à attaquer le dragon avec votre arme. En tant que {occupation}, vous sortez votre {weapon}. Vous attaquez.
+21=Vous touchez {dragonName}.
+22={dragonName} repousse votre attaque avec succès.
+23=Le dragon n'a pas réussi à repousser votre attaque. Votre arme inflige {damage} points de dégâts. Les points de santé du dragon sont maintenant de {healthPoints}.
+24=Avec les derniers mots de 'Arggg !', vous avez vaincu le dragon.
+25=Tapez 'r' pour battre en retraite et 'a' pour attaquer.
+26=Vous battez précipitamment en retraite en léchant vos blessures.
+
+# STATISTIQUES DU PERSONNAGE
+27=Nom
+28=Race
+29=Occupation
+30=Force
+31=Agilité
+32=Points de santé
+33=Arme
+34=Points de dégâts maximum de l'arme
+
+# CONTRE-ATTAQUE DU DRAGON
+35=Vous avez raté {dragonName}.
+36={dragonName} vous a touché.
+37=Le dragon vous a raté.
+38=Vous avez repoussé l'attaque avec succès.
+39=L'attaque du dragon inflige {damage} points de dégâts. Vos points de santé sont maintenant de {healthPoints}.
+40=Avec les derniers mots de 'Oh non !', vous avez été vaincu par le dragon.
+
+# CONDITIONS DE FIN DE PARTIE
+41=Vous battez vite en retraite. Vous rentrez chez vous pauvre mais vivant, prêt à vivre une autre aventure un autre jour. Fin.
+42=Le dragon vaincu, vous ramassez le trésor d'or et rentrez chez vous, riche et célèbre. Fin.
+43=Le dragon rit tandis que votre vue s'éteint. Vous êtes vaincu. Votre famille pleure votre perte. Fin.
+
+# RÉPLIQUES DU DRAGON
+44=Aïe ! Ça a vraiment piqué un peu !
+45=Impressionnant ! Vous méritez peut-être un toast...
+46=Ça... je ne m'y attendais pas. Mais je vous assure que ça n'arrivera plus.
+47=Tiens, tiens ! Vous avez plus de mordant que je ne le pensais !
+
+# RAILLERIES DÉFENSIVES DU DRAGON
+48=Raté, souffle de moucheron !
+49=C'est tout ce que vous avez ? J'ai vu des chatons avec plus de feu dans les pattes !
+50=Faites un effort, {race} ! Vous me faites bâiller !
+51=Si vous plissiez les yeux plus fort, vous toucheriez peut-être quelque chose !
+
+# SOUTIEN À L'AVENTURE ET À L'ATTAQUE
+52=Choix invalide. Réessayez.
+53=-)=====>
+54=zap~~~~~~
+55=-)==>
+56=}     -->
+
+# RÉPLIQUES DU DRAGON QUAND LE JOUEUR SURVIT À UN COUP
+57=Comme c'est mignon. Vous essayez vraiment de gagner.
+58=Vous êtes encore debout ? Votre persévérance est presque aussi agaçante que votre épée.
+59=Vous respirez encore ? Vous êtes vraiment têtu, n'est-ce pas ?
+60=Je suis sincèrement impressionné. La plupart des gens ont assez de bon sens pour mourir bien plus vite que ça.
