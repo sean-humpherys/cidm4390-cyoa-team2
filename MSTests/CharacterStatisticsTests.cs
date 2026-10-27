@@ -9,7 +9,7 @@ public class CharacterStatisticsTests
     [TestMethod]
     public void Display_ReturnsCorrectCharacterInformation()
     {
-        // Arrange
+        
         string name = "Aragorn";
         string race = "Human";
         string occupation = "Warrior";
@@ -19,7 +19,7 @@ public class CharacterStatisticsTests
         string weapon = "Sword";
         int maxWeaponDamage = 25;
 
-        // Act
+       
         string result = CharacterStatistics.Display(
             name,
             race,
@@ -30,7 +30,7 @@ public class CharacterStatisticsTests
             weapon,
             maxWeaponDamage);
 
-        // Assert
+      
         StringAssert.Contains(result, "Name: Aragorn");
         StringAssert.Contains(result, "Race: Human");
         StringAssert.Contains(result, "Occupation: Warrior");
@@ -44,7 +44,7 @@ public class CharacterStatisticsTests
     [TestMethod]
     public void Display_ContainsCorrectHeaderAndFooter()
     {
-        // Arrange & Act
+        
         string result = CharacterStatistics.Display(
             "Aragorn",
             "Human",
@@ -55,7 +55,7 @@ public class CharacterStatisticsTests
             "Sword",
             25);
 
-        // Assert
+        
         StringAssert.Contains(result, "===== CHARACTER STATISTICS =====");
         StringAssert.Contains(result, "================================");
     }
@@ -63,7 +63,7 @@ public class CharacterStatisticsTests
     [TestMethod]
     public void Display_ReturnsAllStatisticsInCorrectOrder()
     {
-        // Arrange
+        
         string expected =
             "===== CHARACTER STATISTICS =====\n" +
             "Name: Aragorn\n" +
@@ -76,7 +76,7 @@ public class CharacterStatisticsTests
             "Maximum Weapon Damage: 25\n" +
             "================================";
 
-        // Act
+        
         string result = CharacterStatistics.Display(
             "Aragorn",
             "Human",
@@ -87,7 +87,7 @@ public class CharacterStatisticsTests
             "Sword",
             25);
 
-        // Assert
+        
         Assert.AreEqual(expected, result);
     }
 }
