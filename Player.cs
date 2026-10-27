@@ -117,7 +117,7 @@ private static string Label(Messages? messages, int id, string fallback) =>
     messages == null ? fallback : messages.GetMessage(id);
 
 
-public string DisplayCharacterStatistics(Messages? messages = null)
+public string DisplayPlayertatistics(Messages? messages = null)
 {
     return
         "===== PLAYER STATISTICS =====\n" +
