@@ -130,6 +130,5 @@ public string DisplayCharacterStatistics(Messages? messages = null)
         $"{Label(messages, WeaponLabelId, "Weapon")}: {Weapon}\n" +
         $"{Label(messages, MaxDamageLabelId, "Maximum Weapon Damage")}: {MaxWeaponDamage}\n" +
         "================================";
-}
-
+    } 
 }
