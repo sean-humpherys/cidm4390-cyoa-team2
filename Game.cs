@@ -35,12 +35,13 @@ public class Game
         _createPlayer = createPlayer ?? CreatePlayer;
     }
 
-    public void StartGame()
+public void StartGame()
+{
+    if (_loadMessagesFromFile)
     {
-        if (_loadMessagesFromFile)
-        {
-            LoadDefaultMessages();
-        }
+        SelectLanguage();
+        LoadDefaultMessages();
+    }
 
         Dice dice = Dice ?? new Dice();
         Dice = dice;
@@ -246,20 +247,62 @@ public class Game
         }
     }
 
-    private void LoadDefaultMessages()
+    private void SelectLanguage()
+{
+    while (true)
     {
-        string? filePath = FindMessageFile("English.txt");
+        _output.WriteLine("Choose your language / Choisissez votre langue / Elige tu idioma:");
+        _output.WriteLine("1. English");
+        _output.WriteLine("2. Français");
+        _output.WriteLine("3. Español");
 
-        if (filePath == null)
+        string? choice = _input.ReadLine()?.Trim();
+
+        switch (choice)
         {
-            throw new FileNotFoundException(
-                "Could not find MessageFiles/English.txt. " +
-                "Check that the MessageFiles folder is available.");
-        }
+            case "1":
+                _messages.CurrentLanguage = "English";
+                return;
 
-        _messages.ReadDictionary(filePath);
+            case "2":
+                _messages.CurrentLanguage = "French";
+                return;
+
+            case "3":
+                _messages.CurrentLanguage = "Spanish";
+                return;
+
+            default:
+                _output.WriteLine("Invalid choice. Try again.");
+                break;
+        }
+    }
+}
+
+   private void LoadDefaultMessages()
+{
+    string fileName = _messages.CurrentLanguage switch
+    {
+        "English" => "English.json",
+        "French" => "French.json",
+        "Spanish" => "Spanish.json",
+        _ => "English.json"
+    };
+
+    string? filePath = FindMessageFile(fileName);
+
+    if (filePath == null)
+    {
+        throw new FileNotFoundException(
+            $"Could not find MessageFiles/{fileName}. " +
+            "Check that the MessageFiles folder is available.");
     }
 
+    if (_messages.CurrentLanguage == "English")
+    {
+        _messages.ReadJsonDictionary(filePath);
+    }
+}
     private static string? FindMessageFile(string fileName)
     {
         string[] startingDirectories =
