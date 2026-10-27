@@ -90,7 +90,8 @@ public class Player
 
 
 
- 
+   
+
     public const int NameLabelId = 27;
 
     public const int RaceLabelId = 28;
@@ -109,28 +110,26 @@ public class Player
 
 
 
-    private static string Label(Messages? messages, int id, string fallback) =>
-
-        messages == null ? fallback : messages.GetMessage(id);
-
-
-
     
+
+
+private static string Label(Messages? messages, int id, string fallback) =>
+    messages == null ? fallback : messages.GetMessage(id);
+
+
 public string DisplayCharacterStatistics(Messages? messages = null)
 {
     return
-        "===== CHARACTER STATISTICS =====\n" +
+        "===== PLAYER STATISTICS =====\n" +
         $"{Label(messages, NameLabelId, "Name")}: {Name}\n" +
         $"{Label(messages, RaceLabelId, "Race")}: {Race}\n" +
         $"{Label(messages, OccupationLabelId, "Occupation")}: {Occupation}\n" +
         $"{Label(messages, StrengthLabelId, "Strength")}: {Strength}\n" +
         $"{Label(messages, AgilityLabelId, "Agility")}: {Agility}\n" +
-        $"{Label(messages, HealthLabelId, "Health")}: {Health}\n" +
+        $"{Label(messages, HealthLabelId, "Health points")}: {Health}\n" +
         $"{Label(messages, WeaponLabelId, "Weapon")}: {Weapon}\n" +
         $"{Label(messages, MaxDamageLabelId, "Maximum Weapon Damage")}: {MaxWeaponDamage}\n" +
         "================================";
 }
 
-
-
-  }
+}
