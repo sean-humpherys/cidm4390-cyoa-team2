@@ -1,3 +1,7 @@
+using System.Text.Json;
+using System.IO;
+using System.Collections.Generic;
+
 namespace CYOA;
 public class Messages
 {
@@ -41,6 +45,37 @@ public class Messages
         _dictionaries[CurrentLanguage] = loaded;
         languageDictionary = loaded;
     }
+
+    public void ReadJsonDictionary(string languageFilePath)
+{
+    if (string.IsNullOrWhiteSpace(languageFilePath))
+        throw new ArgumentException(
+            "Path must not be null or empty.",
+            nameof(languageFilePath));
+
+    if (!File.Exists(languageFilePath))
+        throw new FileNotFoundException(
+            "Language file not found.",
+            languageFilePath);
+
+    string json = File.ReadAllText(languageFilePath);
+
+    var loaded = JsonSerializer.Deserialize<Dictionary<string, string>>(json)
+        ?? throw new FormatException("Invalid JSON language file.");
+
+    var messages = new Dictionary<int, string>();
+
+    foreach (var entry in loaded)
+    {
+        if (!int.TryParse(entry.Key, out int id))
+            throw new FormatException($"Invalid message ID: {entry.Key}");
+
+        messages[id] = entry.Value;
+    }
+
+    _dictionaries[CurrentLanguage] = messages;
+    languageDictionary = messages;
+}
 
     public string GetMessage(int whichMessage)
     {
