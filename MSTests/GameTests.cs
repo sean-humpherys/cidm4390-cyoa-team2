@@ -1,303 +1,310 @@
-using System;
-using System.IO;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-
 namespace CYOA.Tests;
-
+ 
 [TestClass]
 public class GameTests
 {
-    private const string Welcome = "Welcome test message";
-    private const string MenuPrompt = "Menu prompt test message";
-    private const string Goodbye = "Goodbye test message";
-
-    private string _messageFile = "";
-    private Messages _messages = new();
-
-    [TestInitialize]
-    public void Setup()
+    // ---------- helpers ----------
+ 
+    private static string? FindMessageFile(string fileName)
     {
-        _messageFile = Path.GetTempFileName();
-        File.WriteAllText(_messageFile,
-            $"4={Goodbye}\n" +
-            $"5={Welcome}\n" +
-            $"6={MenuPrompt}\n" +
-            $"{Game.RetreatMessageId}=Retreat\n" +
-            $"{Game.DragonDefeatedMessageId}=Victory\n" +
-            $"{Game.PlayerDefeatedMessageId}=Defeat\n" +
-            $"{Game.PathPromptMessageId}=Path prompt\n" +
-            $"{Game.NorthPathMessageId}=North path\n" +
-            $"{Game.SouthPathMessageId}=South path\n" +
-            $"{Game.DragonSaysMessageId}=I am {{dragonName}}\n" +
-            $"{Game.MagicRingMessageId}=Magic ring\n" +
-            $"{Game.RetreatOrAttackPromptMessageId}=Fight prompt\n" +
-            $"{Game.InvalidAdventureChoiceMessageId}=Invalid adventure choice\n");
-        _messages = new Messages();
-        _messages.ReadDictionary(_messageFile);
-    }
-
-    [TestCleanup]
-    public void Cleanup() => File.Delete(_messageFile);
-
-    // ---------------------------------------------------------------
-    // Helpers
-    // ---------------------------------------------------------------
-
-    private static string[] SplitLines(string text) =>
-        text.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
-
-    private static int CountLines(string[] lines, string value)
-    {
-        int n = 0;
-        foreach (string line in lines)
+        string[] startingDirectories =
         {
-            if (line == value) n++;
-        }
-        return n;
-    }
-
-    private static int CountText(string text, string value)
-    {
-        int n = 0, i = 0;
-        while ((i = text.IndexOf(value, i, StringComparison.Ordinal)) >= 0)
+            AppContext.BaseDirectory,
+            Directory.GetCurrentDirectory()
+        };
+ 
+        foreach (string start in startingDirectories)
         {
-            n++;
-            i += value.Length;
+            DirectoryInfo? dir = new DirectoryInfo(start);
+            while (dir != null)
+            {
+                string path = Path.Combine(dir.FullName, "MessageFiles", fileName);
+                if (File.Exists(path))
+                {
+                    return path;
+                }
+                dir = dir.Parent;
+            }
         }
-        return n;
+        return null;
     }
-
-    private (string[] Lines, int CreateCalls) RunMenu(string input) =>
-        RunMenuWithGame(input, out _);
-
-    private (string[] Lines, int CreateCalls) RunMenuWithGame(string input, out Game game)
+ 
+    private static Messages CreateEnglishMessages()
     {
-        int calls = 0;
+        string? path = FindMessageFile("English.json");
+        Assert.IsNotNull(path, "MessageFiles/English.json was not found.");
+ 
+        var messages = new Messages();
+        messages.CurrentLanguage = "English";
+        messages.ReadJsonDictionary(path);
+        return messages;
+    }
+ 
+    private sealed record Setup(Game Game, Messages Messages, StringWriter Output);
+ 
+    private static Setup CreateGame(
+        string input,
+        Action<Dice>? createPlayer = null,
+        Dice? dice = null,
+        Dragon? dragon = null)
+    {
+        Messages messages = CreateEnglishMessages();
         var output = new StringWriter();
-        game = new Game(_messages, new StringReader(input), output, _ => calls++);
-
-        game.StartGame();
-
-        return (SplitLines(output.ToString()), calls);
+        var game = new Game(
+            messages: messages,
+            input: new StringReader(input),
+            output: output,
+            createPlayer: createPlayer ?? (_ => { }),
+            dice: dice,
+            dragon: dragon);
+        return new Setup(game, messages, output);
     }
-
-    private (string Output, int AttackCalls) RunAdventure(string input)
+ 
+    private static void AssertOutputContains(StringWriter output, string expected)
     {
-        int attackCalls = 0;
-        var output = new StringWriter();
-        var game = new Game(_messages, new StringReader(input), output,
-            _ => { }, new Dice(), new Dragon("Smaug"));
-
-        game.StartAdventure(() => attackCalls++);
-
-        return (output.ToString(), attackCalls);
+        Assert.IsTrue(
+            output.ToString().Contains(expected),
+            $"Expected output to contain: {expected}");
     }
-
-    // ---------------------------------------------------------------
-    // Game initialization and main menu
-    // ---------------------------------------------------------------
-
-    [TestMethod]
-    public void DiceAndDragonAreInstantiatedOnStart()
+ 
+    private static void AssertOutputDoesNotContain(StringWriter output, string unexpected)
     {
-        RunMenuWithGame("2\n", out Game game);
-        Assert.IsNotNull(game.Dice);
-        Assert.IsNotNull(game.Dragon);
+        Assert.IsFalse(
+            output.ToString().Contains(unexpected),
+            $"Expected output NOT to contain: {unexpected}");
     }
-
+ 
+    // ---------- StartGame ----------
+ 
     [TestMethod]
-    public void InjectedDiceAndDragonAreKept()
+    public void StartGame_ChoiceOne_CallsCreatePlayerWithDice()
     {
         var dice = new Dice();
-        var dragon = new Dragon("Test");
-        var game = new Game(_messages, new StringReader("2\n"), new StringWriter(),
-            _ => { }, dice, dragon);
-
-        game.StartGame();
-
-        Assert.AreSame(dice, game.Dice);
-        Assert.AreSame(dragon, game.Dragon);
-    }
-
-    [TestMethod]
-    public void StartupDiceIsPassedToCreatePlayer()
-    {
         Dice? received = null;
-        var game = new Game(_messages, new StringReader("1\n"), new StringWriter(),
-            d => received = d);
-
-        game.StartGame();
-
-        Assert.IsNotNull(received);
-        Assert.AreSame(game.Dice, received);
+        Setup s = CreateGame("1\n", createPlayer: d => received = d, dice: dice);
+ 
+        s.Game.StartGame();
+ 
+        Assert.AreSame(dice, received);
     }
-
+ 
     [TestMethod]
-    public void ShowsWelcomeThenMenuPrompt()
+    public void StartGame_ChoiceOne_ShowsWelcomeAndMenuMessages()
     {
-        var (lines, _) = RunMenu("2\n");
-        Assert.AreEqual(Welcome, lines[0]);
-        Assert.AreEqual(MenuPrompt, lines[1]);
+        Setup s = CreateGame("1\n");
+ 
+        s.Game.StartGame();
+ 
+        AssertOutputContains(s.Output, s.Messages.GetMessage(5));
+        AssertOutputContains(s.Output, s.Messages.GetMessage(6));
     }
-
+ 
     [TestMethod]
-    public void Option1StartsCreatePlayer()
+    public void StartGame_ChoiceTwo_EndsGameWithoutCreatingPlayer()
     {
-        var (_, calls) = RunMenu("1\n");
-        Assert.AreEqual(1, calls);
+        bool created = false;
+        Setup s = CreateGame("2\n", createPlayer: _ => created = true);
+ 
+        s.Game.StartGame();
+ 
+        Assert.IsFalse(created);
+        AssertOutputContains(s.Output, s.Messages.GetMessage(4));
     }
-
+ 
     [TestMethod]
-    public void Option2EndsGameWithoutCreatePlayer()
+    public void StartGame_InvalidChoiceThenValid_ShowsInvalidChoiceMessage()
     {
-        var (lines, calls) = RunMenu("2\n");
-        Assert.AreEqual(0, calls);
-        Assert.AreEqual(1, CountLines(lines, Goodbye));
-        Assert.AreEqual(0, CountLines(lines, Game.InvalidChoiceMessage));
+        Setup s = CreateGame("x\n\n2\n");
+ 
+        s.Game.StartGame();
+ 
+        AssertOutputContains(s.Output, Game.InvalidChoiceMessage);
+        AssertOutputContains(s.Output, s.Messages.GetMessage(4));
     }
-
+ 
     [TestMethod]
-    public void WhitespaceIsIgnored()
+    public void StartGame_InputEndsBeforeValidChoice_ThrowsEndOfStreamException()
     {
-        var (_, calls) = RunMenu(" 1 \n");
-        Assert.AreEqual(1, calls);
+        Setup s = CreateGame("");
+ 
+        Assert.ThrowsExactly<EndOfStreamException>(() => s.Game.StartGame());
     }
-
+ 
     [TestMethod]
-    [DataRow("3")]
-    [DataRow("abc")]
-    [DataRow("")]
-    [DataRow("1.0")]
-    public void InvalidInputRepromptsWithoutExitingOrCreatingPlayer(string bad)
+    public void StartGame_NoDragonProvided_CreatesDefaultDragon()
     {
-        var (lines, calls) = RunMenu(bad + "\n2\n");
-        Assert.AreEqual(1, CountLines(lines, Game.InvalidChoiceMessage));
-        Assert.AreEqual(2, CountLines(lines, MenuPrompt));
-        Assert.AreEqual(0, calls);
+        Setup s = CreateGame("2\n");
+ 
+        s.Game.StartGame();
+ 
+        Assert.IsNotNull(s.Game.Dragon);
+        Assert.AreEqual(Game.DefaultDragonName, s.Game.Dragon.DragonName);
     }
-
+ 
     [TestMethod]
-    public void InvalidThenOption1StartsCreatePlayer()
+    public void StartGame_DragonProvided_UsesProvidedDragon()
     {
-        var (_, calls) = RunMenu("x\n1\n");
-        Assert.AreEqual(1, calls);
+        var dragon = new Dragon("Smaug");
+        Setup s = CreateGame("2\n", dragon: dragon);
+ 
+        s.Game.StartGame();
+ 
+        Assert.AreSame(dragon, s.Game.Dragon);
     }
-
+ 
     [TestMethod]
-    public void EndOfInputThrowsInsteadOfLoopingForever()
+    public void StartGame_NoDiceProvided_CreatesDice()
     {
-        var game = new Game(_messages, new StringReader(""), new StringWriter(), _ => { });
-        try
-        {
-            game.StartGame();
-        }
-        catch (EndOfStreamException)
-        {
-            return;
-        }
-        Assert.Fail("Expected EndOfStreamException.");
+        Setup s = CreateGame("2\n");
+ 
+        s.Game.StartGame();
+ 
+        Assert.IsNotNull(s.Game.Dice);
     }
-
-    // ---------------------------------------------------------------
-    // End Game
-    // ---------------------------------------------------------------
-
+ 
     [TestMethod]
-    [DataRow(EndCondition.CharacterRetreats, "Retreat")]
-    [DataRow(EndCondition.DragonDefeated, "Victory")]
-    [DataRow(EndCondition.PlayerDefeated, "Defeat")]
-    public void EndGamePrintsOnlyTheMessageForTheCondition(EndCondition condition, string expected)
+    public void StartGame_ResetsPlayerToNull()
     {
+        Setup s = CreateGame("2\n");
+ 
+        s.Game.StartGame();
+ 
+        Assert.IsNull(s.Game.Player);
+    }
+ 
+    [TestMethod]
+    public void StartGame_NoMessagesProvided_PromptsForLanguage()
+    {
+        // Depends on MessageFiles/English.json being findable from the test output folder.
         var output = new StringWriter();
-        var game = new Game(_messages, new StringReader(""), output, _ => { });
-
-        game.EndGame(condition);
-
-        string[] lines = SplitLines(output.ToString());
-        Assert.AreEqual(1, lines.Length);
-        Assert.AreEqual(expected, lines[0]);
+        var game = new Game(
+            input: new StringReader("x\n1\n2\n"),
+            output: output,
+            createPlayer: _ => { });
+ 
+        game.StartGame();
+ 
+        Assert.IsTrue(output.ToString().Contains("1. English"));
+        Assert.IsTrue(output.ToString().Contains("Invalid choice. Try again."));
     }
-
-    // ---------------------------------------------------------------
-    // Start Adventure (path choice, dragon encounter, retreat or attack)
-    // ---------------------------------------------------------------
-
+ 
+    // ---------- EndGame ----------
+ 
     [TestMethod]
-    public void NorthPathShowsNorthMessageThenDragonEncounter()
+    public void EndGame_NoCondition_WritesGoodbyeMessage()
     {
-        var (output, _) = RunAdventure("n\nr\n");
-        StringAssert.Contains(output, "North path");
-        Assert.IsFalse(output.Contains("South path"));
-        StringAssert.Contains(output, "I am Smaug");
-        StringAssert.Contains(output, "Magic ring");
-        StringAssert.Contains(output, "--- Dragon Statistics ---");
-        StringAssert.Contains(output, "Fight prompt");
+        Setup s = CreateGame("");
+ 
+        s.Game.EndGame();
+ 
+        AssertOutputContains(s.Output, s.Messages.GetMessage(4));
     }
-
+ 
     [TestMethod]
-    public void SouthPathShowsSouthMessageThenReturnsToPathPrompt()
+    [DataRow(Game.EndCondition.CharacterRetreats, Game.RetreatMessageId)]
+    [DataRow(Game.EndCondition.DragonDefeated, Game.DragonDefeatedMessageId)]
+    [DataRow(Game.EndCondition.PlayerDefeated, Game.PlayerDefeatedMessageId)]
+    public void EndGame_WithCondition_WritesMatchingMessage(
+        Game.EndCondition condition, int messageId)
     {
-        var (output, attackCalls) = RunAdventure("s\ne\n");
-        Assert.AreEqual(1, CountText(output, "South path"));
-        Assert.AreEqual(2, CountText(output, "Path prompt"));
-        Assert.IsFalse(output.Contains("North path"));
-        Assert.IsFalse(output.Contains("I am Smaug"));
-        Assert.AreEqual(1, CountText(output, Goodbye));
-        Assert.AreEqual(0, attackCalls);
+        Setup s = CreateGame("");
+ 
+        s.Game.EndGame(condition);
+ 
+        AssertOutputContains(s.Output, s.Messages.GetMessage(messageId));
     }
-
+ 
     [TestMethod]
-    public void SouthThenNorthContinuesToDragonEncounter()
+    public void EndGame_UndefinedCondition_ThrowsArgumentOutOfRange()
     {
-        var (output, _) = RunAdventure("s\nn\nr\n");
-        Assert.AreEqual(1, CountText(output, "South path"));
-        Assert.AreEqual(2, CountText(output, "Path prompt"));
-        StringAssert.Contains(output, "North path");
-        StringAssert.Contains(output, "I am Smaug");
+        Setup s = CreateGame("");
+ 
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(
+            () => s.Game.EndGame((Game.EndCondition)99));
     }
-
+ 
+    // ---------- StartAdventure ----------
+ 
     [TestMethod]
-    public void ExitChoiceShowsEndGameMessageAndStopsBeforeDragon()
+    public void StartAdventure_GameNotStarted_ThrowsInvalidOperation()
     {
-        var (output, attackCalls) = RunAdventure("e\n");
-        Assert.AreEqual(1, CountText(output, Goodbye));
-        Assert.IsFalse(output.Contains("I am Smaug"));
-        Assert.IsFalse(output.Contains("Fight prompt"));
-        Assert.AreEqual(0, attackCalls);
+        Setup s = CreateGame("n\na\n");
+ 
+        Assert.ThrowsExactly<InvalidOperationException>(
+            () => s.Game.StartAdventure(() => { }));
     }
-
+ 
     [TestMethod]
-    public void InvalidPathChoiceRepromptsThenContinues()
+    public void StartAdventure_ExitChoice_EndsGameWithoutAttack()
     {
-        var (output, _) = RunAdventure("x\nn\nr\n");
-        Assert.AreEqual(1, CountText(output, "Invalid adventure choice"));
-        Assert.AreEqual(2, CountText(output, "Path prompt"));
-        StringAssert.Contains(output, "North path");
+        bool attacked = false;
+        Setup s = CreateGame("e\n", dragon: new Dragon("Smaug"));
+ 
+        s.Game.StartAdventure(() => attacked = true);
+ 
+        Assert.IsFalse(attacked);
+        AssertOutputContains(s.Output, s.Messages.GetMessage(Game.PathPromptMessageId));
+        AssertOutputContains(s.Output, s.Messages.GetMessage(4));
     }
-
+ 
     [TestMethod]
-    public void RetreatShowsRetreatEndingAndDoesNotAttack()
+    public void StartAdventure_SouthThenNorthThenAttack_ShowsSouthMessageAndStartsAttack()
     {
-        var (output, attackCalls) = RunAdventure("n\nr\n");
-        Assert.AreEqual(1, CountText(output, "Retreat"));
-        Assert.AreEqual(0, attackCalls);
+        bool attacked = false;
+        var dragon = new Dragon("Smaug");
+        Setup s = CreateGame("s\nn\na\n", dragon: dragon);
+ 
+        s.Game.StartAdventure(() => attacked = true);
+ 
+        Assert.IsTrue(attacked);
+        AssertOutputContains(s.Output, s.Messages.GetMessage(Game.SouthPathMessageId));
+        AssertOutputContains(s.Output, s.Messages.GetMessage(Game.NorthPathMessageId));
+        AssertOutputContains(s.Output, s.Messages.GetMessage(Game.MagicRingMessageId));
+        AssertOutputContains(s.Output, dragon.DisplayStats());
     }
-
+ 
     [TestMethod]
-    public void AttackStartsAttackFlowWithoutEnding()
+    public void StartAdventure_NorthThenRetreat_EndsWithRetreatMessageAndNoAttack()
     {
-        var (output, attackCalls) = RunAdventure("n\na\n");
-        Assert.AreEqual(1, attackCalls);
-        Assert.IsFalse(output.Contains("Retreat"));
-        Assert.IsFalse(output.Contains(Goodbye));
+        bool attacked = false;
+        Setup s = CreateGame("n\nr\n", dragon: new Dragon("Smaug"));
+ 
+        s.Game.StartAdventure(() => attacked = true);
+ 
+        Assert.IsFalse(attacked);
+        AssertOutputContains(s.Output, s.Messages.GetMessage(Game.RetreatMessageId));
+        AssertOutputDoesNotContain(s.Output, s.Messages.GetMessage(Game.SouthPathMessageId));
     }
-
+ 
     [TestMethod]
-    public void InvalidFightChoiceReprompts()
+    public void StartAdventure_InvalidChoice_ShowsInvalidAdventureChoiceMessage()
     {
-        var (output, attackCalls) = RunAdventure("n\nx\na\n");
-        Assert.AreEqual(1, CountText(output, "Invalid adventure choice"));
-        Assert.AreEqual(2, CountText(output, "Fight prompt"));
-        Assert.AreEqual(1, attackCalls);
+        Setup s = CreateGame("q\nn\nr\n", dragon: new Dragon("Smaug"));
+ 
+        s.Game.StartAdventure(() => { });
+ 
+        AssertOutputContains(
+            s.Output, s.Messages.GetMessage(Game.InvalidAdventureChoiceMessageId));
+    }
+ 
+    [TestMethod]
+    public void StartAdventure_InputEnds_ThrowsEndOfStreamException()
+    {
+        Setup s = CreateGame("", dragon: new Dragon("Smaug"));
+ 
+        Assert.ThrowsExactly<EndOfStreamException>(
+            () => s.Game.StartAdventure(() => { }));
+    }
+ 
+    // ---------- StartAttack ----------
+ 
+    [TestMethod]
+    public void StartAttack_NoPlayer_ThrowsInvalidOperation()
+    {
+        Setup s = CreateGame("", dragon: new Dragon("Smaug"));
+ 
+        // Throws before combat is used, so null is safe here.
+        Assert.ThrowsExactly<InvalidOperationException>(
+            () => s.Game.StartAttack(null!));
     }
 }

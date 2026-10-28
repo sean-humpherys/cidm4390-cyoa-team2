@@ -4,7 +4,7 @@ public class Game
 {
     public const string InvalidChoiceMessage = "Invalid choice. Type '1' or '2'.";
 
-    public const string DefaultDragonName = "Dragon";
+    public const string DefaultDragonName = "Dragobah";
 
     private readonly Messages _messages;
     private readonly bool _loadMessagesFromFile;
@@ -15,7 +15,7 @@ public class Game
 
     public Dice? Dice { get; private set; }
     public Dragon? Dragon { get; private set; }
-    public Character? Player { get; private set; }
+    public Player? Player { get; private set; }
 
     public Game(
         Messages? messages = null,
@@ -35,6 +35,12 @@ public class Game
         _createPlayer = createPlayer ?? CreatePlayer;
     }
 
+public enum EndCondition
+{
+    CharacterRetreats,
+    DragonDefeated,
+    PlayerDefeated
+}
 public void StartGame()
 {
     if (_loadMessagesFromFile)
@@ -200,22 +206,22 @@ public void StartGame()
 
     public bool StartAttack(Combat combat)
     {
-        Character player = Player ?? throw new InvalidOperationException(
+        Player player = Player ?? throw new InvalidOperationException(
             "There is no character. Create one before attacking.");
         Dragon dragon = Dragon ?? throw new InvalidOperationException(
             "The game has not been started, so there is no dragon.");
 
         _output.WriteLine(Format(
             _messages.GetMessage(AttackIntroMessageId),
-            ("occupation", player.Occupation),
-            ("weapon", player.Weapon)));
+            ("occupation", player.Occupation.ToString()),
+            ("weapon", player.Weapon.type)));
 
         int? artMessageId = player.Occupation switch
         {
-            "Fighter" => FighterArtMessageId,
-            "Magician" => MagicianArtMessageId,
-            "Thief" => ThiefArtMessageId,
-            "Archer" => ArcherArtMessageId,
+            Occupation.Fighter => FighterArtMessageId,
+            Occupation.Magician => MagicianArtMessageId,
+            Occupation.Thief => ThiefArtMessageId,
+            Occupation.Archer => ArcherArtMessageId,
             _ => null
         };
         if (artMessageId != null)
@@ -337,6 +343,6 @@ public void StartGame()
 
     private void CreatePlayer(Dice dice)
     {
-        Player = Character.Create(_input, _output, null, _messages);
+        Player = Player.Create(_input, _output, null, _messages);
     }
 }
