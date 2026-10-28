@@ -1,5 +1,3 @@
-
-using System;
 using CYOA;
 
 namespace CYOA.Tests;
