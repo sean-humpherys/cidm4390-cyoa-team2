@@ -1,4 +1,5 @@
 using CYOA;
+using System.Text.Json;
 
 namespace CYOA.Tests;
 
@@ -21,10 +22,17 @@ public class MessagesTests
     [TestCleanup]
     public void Cleanup() => Directory.Delete(_dir, true);
 
-    private string Write(string name, params string[] lines)
+    // Writes a message file in the same format as MessageFiles/*.json: { "id": "text", ... }
+    private string Write(string name, params (int Id, string Text)[] messages)
+    {
+        var json = JsonSerializer.Serialize(messages.ToDictionary(m => m.Id.ToString(), m => m.Text));
+        return WriteRaw(name, json);
+    }
+
+    private string WriteRaw(string name, string content)
     {
         var path = Path.Combine(_dir, name);
-        File.WriteAllLines(path, lines);
+        File.WriteAllText(path, content);
         return path;
     }
 
@@ -32,11 +40,11 @@ public class MessagesTests
     {
         var m = new Messages();
         m.CurrentLanguage = English;
-        m.ReadDictionary(Write("en.txt", "1=Welcome to the adventure!", "2=Game over.", "3=English only"));
+        m.ReadDictionary(Write("en.json", (1, "Welcome to the adventure!"), (2, "Game over."), (3, "English only")));
         m.CurrentLanguage = French;
-        m.ReadDictionary(Write("fr.txt", "1=Bienvenue dans l'aventure !", "2=Partie terminée."));
+        m.ReadDictionary(Write("fr.json", (1, "Bienvenue dans l'aventure !"), (2, "Partie terminée.")));
         m.CurrentLanguage = Spanish;
-        m.ReadDictionary(Write("es.txt", "1=¡Bienvenido a la aventura!", "2=Fin del juego."));
+        m.ReadDictionary(Write("es.json", (1, "¡Bienvenido a la aventura!"), (2, "Fin del juego.")));
         return m;
     }
 
@@ -86,30 +94,38 @@ public class MessagesTests
     }
 
     [TestMethod]
-    public void ReadDictionary_IgnoresCommentsAndBlankLines()
+    public void ReadDictionary_TextKeepsSpecialCharacters()
     {
         var m = new Messages();
-        m.ReadDictionary(Write("c.txt", "# comment", "", "1=Hi"));
-        Assert.AreEqual("Hi", m.GetMessage(1));
+        m.ReadDictionary(Write("s.json", (1, "a=b \"quoted\" {dragonName}")));
+        Assert.AreEqual("a=b \"quoted\" {dragonName}", m.GetMessage(1));
     }
 
     [TestMethod]
-    public void ReadDictionary_TextMayContainEquals()
+    public void ReadDictionary_ReadsRealMessageFileFormat()
     {
         var m = new Messages();
-        m.ReadDictionary(Write("e.txt", "1=a=b"));
-        Assert.AreEqual("a=b", m.GetMessage(1));
+        m.ReadDictionary(WriteRaw("r.json", "{\r\n  \"4\": \"Adventure ends. Bye.\",\r\n  \"5\": \"Welcome\"\r\n}\r\n"));
+        Assert.AreEqual("Adventure ends. Bye.", m.GetMessage(4));
+        Assert.AreEqual("Welcome", m.GetMessage(5));
     }
 
     [TestMethod]
     public void ReadDictionary_MissingFile_Throws() =>
         Assert.ThrowsExactly<FileNotFoundException>(() =>
-            new Messages().ReadDictionary(Path.Combine(_dir, "none.txt")));
+            new Messages().ReadDictionary(Path.Combine(_dir, "none.json")));
 
     [TestMethod]
-    public void ReadDictionary_MalformedLine_Throws()
+    public void ReadDictionary_InvalidJson_Throws()
     {
-        var path = Write("bad.txt", "oops");
+        var path = WriteRaw("bad.json", "{ \"1\": \"missing closing brace\"");
+        Assert.ThrowsExactly<JsonException>(() => new Messages().ReadDictionary(path));
+    }
+
+    [TestMethod]
+    public void ReadDictionary_NonNumericKey_Throws()
+    {
+        var path = WriteRaw("key.json", "{ \"one\": \"Hi\" }");
         Assert.ThrowsExactly<FormatException>(() => new Messages().ReadDictionary(path));
     }
 
