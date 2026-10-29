@@ -5,5 +5,5 @@ game.StartGame();
 
 if (game.Player != null)
 {
-    game.StartAdventure(() => game.StartAttack(new Combat()));
+    game.StartAdventure(() => game.StartAttack());
 }
