@@ -1,5 +1,4 @@
 {
-  "4": "Adventure ends. Bye.",
   "5": "Welcome to Choose Your Adventure Game",
   "6": "Choose: 1. Create Character or 2. Exit. Type '1' or '2'",
   "7": "You are walking in the mountains. You see two paths, one leading north and higher into the mountains. The other path leads south and into the woods. Enter 'n' for North. Enter 's' for South. Enter 'e' for exit game.",
@@ -55,5 +54,11 @@
   "57": "How adorable. You're actually trying to win.",
   "58": "You're still standing? Your persistence is almost as annoying as your sword.",
   "59": "Still breathing? You really are a stubborn, aren't you?",
-  "60": "I'm genuinely impressed. Most people have the common sense to die much faster than this."
+  "60": "I'm genuinely impressed. Most people have the common sense to die much faster than this.",
+  "61": "Attack roll: {roll}",
+  "62": "Defense roll: {roll}",
+  "63": "{dragonName} attacks!",
+  "64": "You smirk as the attack misses you!",
+  "65": "You grit your teeth after the hit!",
+  "66": "--- Dragon Statistics ---"
 }

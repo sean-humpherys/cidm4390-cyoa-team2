@@ -316,25 +316,58 @@ public class Game
         }
     }
 
-    private void LoadDefaultMessages()
+private void LoadDefaultMessages()
+{
+    string fileName = _messages.CurrentLanguage switch
     {
-        string fileName = _messages.CurrentLanguage switch
-        {
-            "English" => "English.json",
-            "French" => "French.json",
-            "Spanish" => "Spanish.json",
-            _ => "English.json"
-        };
+        "English" => "English.json",
+        "French" => "French.json",
+        "Spanish" => "Spanish.json",
+        _ => "English.json"
+    };
 
-        string? filePath = FindMessageFile(fileName);
+    string? filePath = FindMessageFile(fileName);
 
-        if (filePath == null)
+    if (filePath == null)
+    {
+        throw new FileNotFoundException(
+            $"Could not find MessageFiles/{fileName}. " +
+            "Check that the MessageFiles folder is available.");
+    }
+
+    _messages.ReadJsonDictionary(filePath);
+}
+
+private static string? FindMessageFile(string fileName)
+{
+    string[] startingDirectories =
+    {
+        AppContext.BaseDirectory,
+        Directory.GetCurrentDirectory()
+    };
+
+    foreach (string startingDirectory in startingDirectories)
+    {
+        DirectoryInfo? directory = new DirectoryInfo(startingDirectory);
+
+        while (directory != null)
         {
-            throw new FileNotFoundException(
-                $"Could not find MessageFiles/{fileName}. " +
-                "Check that the MessageFiles folder is available.");
+            string path = Path.Combine(
+                directory.FullName,
+                "MessageFiles",
+                fileName);
+
+            if (File.Exists(path))
+            {
+                return path;
+            }
+
+            directory = directory.Parent;
         }
+    }
 
+    return null;
+}
         _messages.ReadDictionary(filePath);
     }
 

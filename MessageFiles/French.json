@@ -1,5 +1,4 @@
 {
-  "4": "L'aventure se termine. Au revoir.",
   "5": "Bienvenue dans le jeu Choisissez Votre Aventure",
   "6": "Choisissez : 1. Créer un personnage ou 2. Quitter. Tapez '1' ou '2'",
   "7": "Vous marchez dans les montagnes. Vous voyez deux chemins : l'un monte vers le nord, plus haut dans les montagnes. L'autre mène vers le sud, dans les bois. Tapez 'n' pour le nord. Tapez 's' pour le sud. Tapez 'e' pour quitter le jeu.",
@@ -55,5 +54,11 @@
   "57": "Comme c'est mignon. Vous essayez vraiment de gagner.",
   "58": "Vous êtes encore debout ? Votre persévérance est presque aussi agaçante que votre épée.",
   "59": "Vous respirez encore ? Vous êtes vraiment têtu, n'est-ce pas ?",
-  "60": "Je suis sincèrement impressionné. La plupart des gens ont assez de bon sens pour mourir bien plus vite que ça."
+  "60": "Je suis sincèrement impressionné. La plupart des gens ont assez de bon sens pour mourir bien plus vite que ça.",
+  "61": "Jet d'attaque : {roll}",
+  "62": "Jet de défense : {roll}",
+  "63": "{dragonName} attaque !",
+  "64": "Vous souriez en voyant l'attaque vous manquer !",
+  "65": "Vous serrez les dents après le coup !",
+  "66": "--- Statistiques du dragon ---"
 }
