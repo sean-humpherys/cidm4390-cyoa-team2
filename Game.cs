@@ -1,5 +1,6 @@
-namespace CYOA;
+using System.Globalization;
 
+namespace CYOA;
 public class Game
 {
     public const string DefaultDragonName = "Dagobah";
@@ -32,30 +33,7 @@ public class Game
         _output = output ?? Console.Out;
         _createPlayer = createPlayer ?? CreatePlayer;
     }
-   
-    public const int PathPromptMessageId = 7;
-    public const int SouthPathMessageId = 8;
-    public const int NorthPathMessageId = 9;
-    public const int DragonSaysMessageId = 10;
-    public const int MagicRingMessageId = 11;
-    public const int RetreatOrAttackPromptMessageId = 12;
-    public const int RacePromptMessageId = 13;
-    public const int NamePromptMessageId = 14;
-    public const int OccupationPromptMessageId = 15;
-    public const int StrengthPromptMessageId = 16;
-    public const int AgilityPromptMessageId = 17;
-    public const int HealthPromptMessageId = 18;
-    public const int AttackIntroMessageId = 20;        
-    public const int AttackPromptMessageId = 25;
-    public const int AttackRetreatMessageId = 26;
-    public const int RetreatMessageId = 41;
-    public const int DragonDefeatedMessageId = 42;
-    public const int PlayerDefeatedMessageId = 43;
-    public const int InvalidAdventureChoiceMessageId = 52;
-    public const int FighterArtMessageId = 53;
-    public const int MagicianArtMessageId = 54;
-    public const int ThiefArtMessageId = 55;
-    public const int ArcherArtMessageId = 56;
+
     public void StartGame()
     {
         if (_loadMessagesFromFile)
@@ -86,13 +64,18 @@ public class Game
             {
                 case "1":
                     _createPlayer(die);
+
+                    if (Player != null)
+                    {
+                        StartAdventure(() => StartAttack());
+                    }
                     return;
 
                 case "2":
                     return;
 
                 default:
-                    _output.WriteLine(_messages.GetMessage(InvalidAdventureChoiceMessageId));
+                    _output.WriteLine(_messages.GetMessage(52));
                     break;
             }
         }
@@ -106,13 +89,13 @@ public class Game
         string pathChoice;
         while (true)
         {
-            pathChoice = ReadChoice(PathPromptMessageId, "n", "s", "e");
+            pathChoice = ReadChoice(7, "n", "s", "e");
             if (pathChoice != "s")
             {
                 break;
             }
 
-            _output.WriteLine(_messages.GetMessage(SouthPathMessageId));
+            _output.WriteLine(_messages.GetMessage(8));
         }
 
         if (pathChoice == "e")
@@ -120,27 +103,27 @@ public class Game
             return;
         }
 
-        _output.WriteLine(_messages.GetMessage(NorthPathMessageId));
+        _output.WriteLine(_messages.GetMessage(9));
 
         Console.ForegroundColor = ConsoleColor.Red;
         try
         {
             _output.WriteLine(Format(
-                _messages.GetMessage(DragonSaysMessageId),
-                ("dragonName", dragon.Name)));
+                _messages.GetMessage(10),
+                ("dragonName", dragon.DragonName)));
         }
         finally
         {
             Console.ResetColor();
         }
 
-        _output.WriteLine(_messages.GetMessage(MagicRingMessageId));
+        _output.WriteLine(_messages.GetMessage(11));
         _output.WriteLine(dragon.DisplayStats(_messages));
 
-        string fightChoice = ReadChoice(RetreatOrAttackPromptMessageId, "r", "a");
+        string fightChoice = ReadChoice(12, "r", "a");
         if (fightChoice == "r")
         {
-            _output.WriteLine(_messages.GetMessage(RetreatMessageId));
+            _output.WriteLine(_messages.GetMessage(41));
             return;
         }
 
@@ -154,10 +137,10 @@ public class Game
         Dragon dragon = Dragon ?? throw new InvalidOperationException(
             "The game has not been started, so there is no dragon.");
 
-        var combat = new Combat(player, dragon, _messages);
+        var combat = new Combat(_messages, _output);
 
         _output.WriteLine(Format(
-            _messages.GetMessage(AttackIntroMessageId),
+            _messages.GetMessage(20),
             ("occupation", player.Occupation.ToString()),
             ("weapon", player.Weapon.type)));
 
@@ -165,23 +148,23 @@ public class Game
 
         while (true)
         {
-            combat.PlayerAttacksDragonSequence();
-            if (dragon.Health <= 0)
+            combat.PlayerAttack(player, dragon);
+            if (dragon.DragonHealth <= 0)
             {
-                _output.WriteLine(_messages.GetMessage(DragonDefeatedMessageId));
+                _output.WriteLine(_messages.GetMessage(42));
                 return false;
             }
 
-            combat.DragonAttacksPlayerSequence();
+            combat.DragonAttack(dragon, player);
             if (player.Health <= 0)
             {
-                _output.WriteLine(_messages.GetMessage(PlayerDefeatedMessageId));
+                _output.WriteLine(_messages.GetMessage(43));
                 return false;
             }
 
-            if (ReadChoice(AttackPromptMessageId, "r", "a") == "r")
+            if (ReadChoice(25, "r", "a") == "r")
             {
-                _output.WriteLine(_messages.GetMessage(AttackRetreatMessageId));
+                _output.WriteLine(_messages.GetMessage(26));
                 return true;
             }
         }
@@ -189,53 +172,59 @@ public class Game
 
     private static int ArtMessageIdFor(Occupation occupation) => occupation switch
     {
-        Occupation.Fighter => FighterArtMessageId,
-        Occupation.Magician => MagicianArtMessageId,
-        Occupation.Thief => ThiefArtMessageId,
-        _ => ArcherArtMessageId
+        Occupation.Fighter => 53,
+        Occupation.Magician => 54,
+        Occupation.Thief => 55,
+        _ => 56
     };
 
     private void CreatePlayer(Die die)
     {
-        Race race = Enum.Parse<Race>(
-            ReadChoice(RacePromptMessageId, Enum.GetNames<Race>()), true);
+        Race race = Enum.Parse<Race>(ReadChoice(13, Enum.GetNames<Race>()), true);
         string name = ReadName();
-        Occupation occupation = Enum.Parse<Occupation>(
-            ReadChoice(OccupationPromptMessageId, Enum.GetNames<Occupation>()), true);
+        Occupation occupation = Enum.Parse<Occupation>(ReadChoice(15, Enum.GetNames<Occupation>()), true);
 
-        var player = new Player(name, race, occupation);
-        player.Weapon.asciiArt = _messages.GetMessage(ArtMessageIdFor(occupation));
+        Weapon weapon = WeaponFor(occupation);
+        weapon.asciiArt = _messages.GetMessage(ArtMessageIdFor(occupation));
 
         bool isHalfling = race == Race.Halfling;
 
         // Strength: 1-20, then +1-4 (Human, Elf, Dwarf) or -1-4 (Halfling).
-        ReadChoice(StrengthPromptMessageId, "roll");
+        ReadChoice(16, "roll");
         int strengthModifier = Die.Roll(4);
-        player.Strength = Die.Roll(20) + (isHalfling ? -strengthModifier : strengthModifier);
-        _output.WriteLine($"{_messages.GetMessage(Messages.StrengthLabelId)}: {player.Strength}");
+        int strength = Die.Roll(20) + (isHalfling ? -strengthModifier : strengthModifier);
+        _output.WriteLine($"{_messages.GetMessage(30)}: {strength}");
 
         // Agility: 1-20, then +1-4 (Halfling, Elf). Human and Dwarf have no modifier.
-        ReadChoice(AgilityPromptMessageId, "roll");
-        player.Agility = Die.Roll(20);
+        ReadChoice(17, "roll");
+        int agility = Die.Roll(20);
         if (isHalfling || race == Race.Elf)
         {
-            player.Agility += Die.Roll(4);
+            agility += Die.Roll(4);
         }
-        _output.WriteLine($"{_messages.GetMessage(Messages.AgilityLabelId)}: {player.Agility}");
+        _output.WriteLine($"{_messages.GetMessage(31)}: {agility}");
 
         // Health: 1-20, then add the strength modifier (Human, Elf, Dwarf). Halfling has none.
-        ReadChoice(HealthPromptMessageId, "roll");
-        player.Health = Die.Roll(20) + (isHalfling ? 0 : strengthModifier);
-        _output.WriteLine($"{_messages.GetMessage(Messages.HealthLabelId)}: {player.Health}");
+        ReadChoice(18, "roll");
+        int health = Die.Roll(20) + (isHalfling ? 0 : strengthModifier);
+        _output.WriteLine($"{_messages.GetMessage(32)}: {health}");
 
-        Player = player;
+        Player = new Player(name, race, occupation, strength, agility, health, weapon);
     }
+
+    private static Weapon WeaponFor(Occupation occupation) => occupation switch
+    {
+        Occupation.Fighter => new Weapon("Sword", 20, ""),
+        Occupation.Magician => new Weapon("Staff", 15, ""),
+        Occupation.Thief => new Weapon("Dagger", 12, ""),
+        _ => new Weapon("Bow", 18, "")
+    };
 
     private string ReadName()
     {
         while (true)
         {
-            _output.WriteLine(_messages.GetMessage(NamePromptMessageId));
+            _output.WriteLine(_messages.GetMessage(14));
 
             string? line = _input.ReadLine();
             if (line == null)
@@ -250,7 +239,7 @@ public class Game
                 return name;
             }
 
-            _output.WriteLine(_messages.GetMessage(InvalidAdventureChoiceMessageId));
+            _output.WriteLine(_messages.GetMessage(52));
         }
     }
 
@@ -263,8 +252,13 @@ public class Game
         return template;
     }
 
-    // Matching ignores case ("Elf", "elf"); the canonical spelling from validChoices is returned.
     private string ReadChoice(int promptMessageId, params string[] validChoices)
+    {
+        int index = ReadChoiceIndex(promptMessageId, validChoices.Select(c => new[] { c }).ToArray());
+        return validChoices[index];
+    }
+
+    private int ReadChoiceIndex(int promptMessageId, params string[][] choices)
     {
         while (true)
         {
@@ -277,15 +271,16 @@ public class Game
                     "Input ended before a valid choice was entered.");
             }
 
-            string choice = line.Trim();
-            int index = Array.FindIndex(validChoices,
-                c => string.Equals(c, choice, StringComparison.OrdinalIgnoreCase));
+            string answer = line.Trim();
+            int index = Array.FindIndex(choices,
+                words => words.Any(w => string.Compare(w, answer, CultureInfo.InvariantCulture,
+                    CompareOptions.IgnoreCase | CompareOptions.IgnoreNonSpace) == 0));
             if (index >= 0)
             {
-                return validChoices[index];
+                return index;
             }
 
-            _output.WriteLine(_messages.GetMessage(InvalidAdventureChoiceMessageId));
+            _output.WriteLine(_messages.GetMessage(52));
         }
     }
 
@@ -340,7 +335,7 @@ public class Game
                 "Check that the MessageFiles folder is available.");
         }
 
-        _messages.ReadJsonDictionary(filePath);
+        _messages.ReadDictionary(filePath);
     }
 
     private static string? FindMessageFile(string fileName)
