@@ -279,7 +279,7 @@ public void StartGame()
     }
 }
 
-   private void LoadDefaultMessages()
+private void LoadDefaultMessages()
 {
     string fileName = _messages.CurrentLanguage switch
     {
@@ -298,10 +298,7 @@ public void StartGame()
             "Check that the MessageFiles folder is available.");
     }
 
-    if (_messages.CurrentLanguage == "English")
-    {
-        _messages.ReadJsonDictionary(filePath);
-    }
+    _messages.ReadJsonDictionary(filePath);
 }
     private static string? FindMessageFile(string fileName)
     {

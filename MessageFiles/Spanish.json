@@ -1,5 +1,4 @@
 {
-  "4": "La aventura termina. Adiós.",
   "5": "Bienvenido al juego Elige Tu Propia Aventura",
   "6": "Elige: 1. Crear personaje o 2. Salir. Escribe '1' o '2'",
   "7": "Caminas por las montañas. Ves dos caminos: uno va hacia el norte y sube más alto por las montañas. El otro va hacia el sur, hacia el bosque. Escribe 'n' para el norte. Escribe 's' para el sur. Escribe 'e' para salir del juego.",
@@ -55,5 +54,11 @@
   "57": "Qué adorable. De verdad estás intentando ganar.",
   "58": "¿Sigues en pie? Tu persistencia es casi tan molesta como tu espada.",
   "59": "¿Sigues respirando? De verdad eres terco, ¿no?",
-  "60": "Estoy realmente impresionado. La mayoría tiene el sentido común de morir mucho más rápido que esto."
+  "60": "Estoy realmente impresionado. La mayoría tiene el sentido común de morir mucho más rápido que esto.",
+  "61": "Tirada de ataque: {roll}",
+  "62": "Tirada de defensa: {roll}",
+  "63": "¡{dragonName} ataca!",
+  "64": "¡Sonríes mientras el ataque te falla!",
+  "65": "¡Aprietas los dientes tras el golpe!",
+  "66": "--- Estadísticas del dragón ---"
 }
