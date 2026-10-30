@@ -30,10 +30,10 @@ public class Player
         int id,
         string fallback) =>
         messages == null ? fallback : messages.GetMessage(id);
-    public string DisplayPlayertatistics(Messages? messages = null)
+    public string DisplayPlayerStatistics(Messages? messages = null)
     {
         return
-            "===== PLAYER STATISTICS =====\n" +
+            "===== PlayerStatistics =====\n" +
             $"{Label(messages, 27, "Name")}: {Name}\n" +
             $"{Label(messages, 28, "Race")}: {Race}\n" +
             $"{Label(messages, 29, "Occupation")}: {Occupation}\n" +

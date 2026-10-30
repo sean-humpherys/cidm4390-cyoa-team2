@@ -51,7 +51,7 @@ public class PlayerTests
             weapon);
 
         // Act
-        string statistics = player.DisplayPlayertatistics();
+        string statistics = player.DisplayPlayerStatistics();
 
         // Assert
         StringAssert.Contains(statistics, "PLAYER STATISTICS");
@@ -82,7 +82,7 @@ public class PlayerTests
             weapon);
 
         // Act
-        string statistics = player.DisplayPlayertatistics(null);
+        string statistics = player.DisplayPlayerStatistics(null);
 
         // Assert
         StringAssert.Contains(statistics, "Name: Ember");
