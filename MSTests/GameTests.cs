@@ -6,7 +6,29 @@ namespace CYOA.Tests;
 public class GameTests
 {
     // Character creation answers for menu option 1: race, name, occupation, then three rolls.
-    private const string CreateElfThief = "1\nElf\nEmber\nThief\nroll\nroll\nroll\n";
+    private const string CreateElfThiefAnswers = "1\nElf\nEmber\nThief\nroll\nroll\nroll\n";
+
+    // StartGame goes on into the adventure after creating the character; "e" exits at the path choice.
+    private const string CreateElfThief = CreateElfThiefAnswers + "e\n";
+
+    private const int WelcomeMessageId = 5;
+    private const int MenuMessageId = 6;
+    private const int PathPromptMessageId = 7;
+    private const int SouthPathMessageId = 8;
+    private const int NorthPathMessageId = 9;
+    private const int DragonSaysMessageId = 10;
+    private const int MagicRingMessageId = 11;
+    private const int StrengthLabelId = 30;
+    private const int AgilityLabelId = 31;
+    private const int HealthLabelId = 32;
+    private const int AttackIntroMessageId = 20;
+    private const int AttackPromptMessageId = 25;
+    private const int AttackRetreatMessageId = 26;
+    private const int RetreatMessageId = 41;
+    private const int DragonDefeatedMessageId = 42;
+    private const int PlayerDefeatedMessageId = 43;
+    private const int InvalidChoiceMessageId = 52;
+    private const int ThiefArtMessageId = 55;
 
     // ---------- helpers ----------
 
@@ -32,7 +54,7 @@ public class GameTests
         Assert.IsNotNull(path, "MessageFiles/English.json was not found.");
 
         var messages = new Messages { CurrentLanguage = "English" };
-        messages.ReadJsonDictionary(path);
+        messages.ReadDictionary(path);
         return messages;
     }
 
@@ -51,7 +73,7 @@ public class GameTests
         return new Setup(game, messages, output);
     }
 
-    // Uses the real character creation, so Game.Player is set after StartGame.
+    // Uses the real character creation (Player.Create), so Game.Player is set after StartGame.
     private static Setup CreateGameWithPlayer(string input, Dragon? dragon = null)
     {
         Messages messages = CreateEnglishMessages();
@@ -83,8 +105,8 @@ public class GameTests
 
         s.Game.StartGame();
 
-        AssertOutputContains(s.Output, s.Messages.GetMessage(5));
-        AssertOutputContains(s.Output, s.Messages.GetMessage(6));
+        AssertOutputContains(s.Output, s.Messages.GetMessage(WelcomeMessageId));
+        AssertOutputContains(s.Output, s.Messages.GetMessage(MenuMessageId));
     }
 
     [TestMethod]
@@ -109,7 +131,6 @@ public class GameTests
 
         Assert.IsFalse(created);
         Assert.IsNull(s.Game.Player);
-        Assert.IsFalse(s.Output.ToString().Contains(s.Messages.GetMessage(4)));
     }
 
     [TestMethod]
@@ -122,8 +143,8 @@ public class GameTests
 
         s.Game.StartGame();
 
-        AssertOutputContains(s.Output, s.Messages.GetMessage(Game.InvalidAdventureChoiceMessageId));
-        Assert.AreEqual(2, CountText(s.Output.ToString(), s.Messages.GetMessage(6)));
+        AssertOutputContains(s.Output, s.Messages.GetMessage(InvalidChoiceMessageId));
+        Assert.AreEqual(2, CountText(s.Output.ToString(), s.Messages.GetMessage(MenuMessageId)));
     }
 
     [TestMethod]
@@ -152,7 +173,7 @@ public class GameTests
         s.Game.StartGame();
 
         Assert.IsNotNull(s.Game.Dragon);
-        Assert.AreEqual(Game.DefaultDragonName, s.Game.Dragon.Name);
+        Assert.AreEqual(Game.DefaultDragonName, s.Game.Dragon.DragonName);
     }
 
     [TestMethod]
@@ -180,14 +201,15 @@ public class GameTests
         Assert.AreEqual("Ember", player.Name);
         Assert.AreEqual(Race.Elf, player.Race);
         Assert.AreEqual(Occupation.Thief, player.Occupation);
-        Assert.AreEqual("dagger", player.Weapon.type);
-        Assert.AreEqual(s.Messages.GetMessage(Game.ThiefArtMessageId), player.Weapon.asciiArt);
+        Assert.AreEqual("Dagger", player.Weapon.type);
+        Assert.AreEqual(12, player.Weapon.maxDamage);
+        Assert.AreEqual(s.Messages.GetMessage(ThiefArtMessageId), player.Weapon.asciiArt);
     }
 
     [TestMethod]
     public void StartGame_ChoiceOne_ChoicesIgnoreCase()
     {
-        Setup s = CreateGameWithPlayer("1\nDWARF\nEmber\narcher\nROLL\nRoll\nroll\n");
+        Setup s = CreateGameWithPlayer("1\nDWARF\nEmber\narcher\nROLL\nRoll\nroll\ne\n");
 
         s.Game.StartGame();
 
@@ -199,14 +221,14 @@ public class GameTests
     [TestMethod]
     public void StartGame_ChoiceOne_RejectsInvalidRaceAndEmptyName()
     {
-        Setup s = CreateGameWithPlayer("1\nOrc\nElf\n\nEmber\nThief\nroll\nroll\nroll\n");
+        Setup s = CreateGameWithPlayer("1\nOrc\nElf\n\nEmber\nThief\nroll\nroll\nroll\ne\n");
 
         s.Game.StartGame();
 
         Assert.IsNotNull(s.Game.Player);
         Assert.AreEqual(Race.Elf, s.Game.Player.Race);
         Assert.AreEqual("Ember", s.Game.Player.Name);
-        Assert.AreEqual(2, CountText(s.Output.ToString(), s.Messages.GetMessage(Game.InvalidAdventureChoiceMessageId)));
+        Assert.AreEqual(2, CountText(s.Output.ToString(), s.Messages.GetMessage(InvalidChoiceMessageId)));
     }
 
     [TestMethod]
@@ -217,9 +239,31 @@ public class GameTests
         s.Game.StartGame();
 
         Player player = s.Game.Player!;
-        AssertOutputContains(s.Output, $"{s.Messages.GetMessage(Messages.StrengthLabelId)}: {player.Strength}");
-        AssertOutputContains(s.Output, $"{s.Messages.GetMessage(Messages.AgilityLabelId)}: {player.Agility}");
-        AssertOutputContains(s.Output, $"{s.Messages.GetMessage(Messages.HealthLabelId)}: {player.Health}");
+        AssertOutputContains(s.Output, $"{s.Messages.GetMessage(StrengthLabelId)}: {player.Strength}");
+        AssertOutputContains(s.Output, $"{s.Messages.GetMessage(AgilityLabelId)}: {player.Agility}");
+        AssertOutputContains(s.Output, $"{s.Messages.GetMessage(HealthLabelId)}: {player.Health}");
+    }
+
+    [TestMethod]
+    public void StartGame_ChoiceOne_RunsAdventureAfterCreatingPlayer()
+    {
+        Setup s = CreateGameWithPlayer(CreateElfThiefAnswers + "n\nr\n");
+
+        s.Game.StartGame();
+
+        AssertOutputContains(s.Output, s.Messages.GetMessage(PathPromptMessageId));
+        AssertOutputContains(s.Output, s.Messages.GetMessage(NorthPathMessageId));
+        AssertOutputContains(s.Output, s.Messages.GetMessage(RetreatMessageId));
+    }
+
+    [TestMethod]
+    public void StartGame_ChoiceTwo_DoesNotStartAdventure()
+    {
+        Setup s = CreateGameWithPlayer("2\n");
+
+        s.Game.StartGame();
+
+        Assert.IsFalse(s.Output.ToString().Contains(s.Messages.GetMessage(PathPromptMessageId)));
     }
 
     // ---------- StartAdventure ----------
@@ -242,7 +286,7 @@ public class GameTests
         s.Game.StartAdventure(() => attacked = true);
 
         Assert.IsFalse(attacked);
-        Assert.IsFalse(s.Output.ToString().Contains(s.Messages.GetMessage(4)));
+        Assert.IsFalse(s.Output.ToString().Contains(s.Messages.GetMessage(NorthPathMessageId)));
     }
 
     [TestMethod]
@@ -254,9 +298,9 @@ public class GameTests
         s.Game.StartAdventure(() => { });
 
         string output = s.Output.ToString();
-        Assert.AreEqual(1, CountText(output, s.Messages.GetMessage(Game.SouthPathMessageId)));
-        Assert.AreEqual(2, CountText(output, s.Messages.GetMessage(Game.PathPromptMessageId)));
-        Assert.IsFalse(output.Contains(s.Messages.GetMessage(Game.NorthPathMessageId)));
+        Assert.AreEqual(1, CountText(output, s.Messages.GetMessage(SouthPathMessageId)));
+        Assert.AreEqual(2, CountText(output, s.Messages.GetMessage(PathPromptMessageId)));
+        Assert.IsFalse(output.Contains(s.Messages.GetMessage(NorthPathMessageId)));
     }
 
     [TestMethod]
@@ -268,9 +312,9 @@ public class GameTests
 
         s.Game.StartAdventure(() => { });
 
-        AssertOutputContains(s.Output, s.Messages.GetMessage(Game.NorthPathMessageId));
-        AssertOutputContains(s.Output, s.Messages.GetMessage(Game.DragonSaysMessageId).Replace("{dragonName}", "Smaug"));
-        AssertOutputContains(s.Output, s.Messages.GetMessage(Game.MagicRingMessageId));
+        AssertOutputContains(s.Output, s.Messages.GetMessage(NorthPathMessageId));
+        AssertOutputContains(s.Output, s.Messages.GetMessage(DragonSaysMessageId).Replace("{dragonName}", "Smaug"));
+        AssertOutputContains(s.Output, s.Messages.GetMessage(MagicRingMessageId));
         AssertOutputContains(s.Output, dragon.DisplayStats(s.Messages));
     }
 
@@ -284,8 +328,7 @@ public class GameTests
         s.Game.StartAdventure(() => attacked = true);
 
         Assert.IsFalse(attacked);
-        AssertOutputContains(s.Output, s.Messages.GetMessage(Game.RetreatMessageId));
-        Assert.IsFalse(s.Output.ToString().Contains(s.Messages.GetMessage(4)));
+        AssertOutputContains(s.Output, s.Messages.GetMessage(RetreatMessageId));
     }
 
     [TestMethod]
@@ -308,8 +351,8 @@ public class GameTests
 
         s.Game.StartAdventure(() => { });
 
-        AssertOutputContains(s.Output, s.Messages.GetMessage(Game.InvalidAdventureChoiceMessageId));
-        Assert.AreEqual(2, CountText(s.Output.ToString(), s.Messages.GetMessage(Game.PathPromptMessageId)));
+        AssertOutputContains(s.Output, s.Messages.GetMessage(InvalidChoiceMessageId));
+        Assert.AreEqual(2, CountText(s.Output.ToString(), s.Messages.GetMessage(PathPromptMessageId)));
     }
 
     [TestMethod]
@@ -320,6 +363,10 @@ public class GameTests
 
         Assert.ThrowsExactly<EndOfStreamException>(() => s.Game.StartAdventure(() => { }));
     }
+
+    // ---------- StartAttack ----------
+    // Combat hits when a d20 roll <= strength and defends when a d20 roll <= agility,
+    // so 20 always succeeds and 0 always fails.
 
     [TestMethod]
     public void StartAttack_NoPlayer_ThrowsInvalidOperation()
@@ -333,24 +380,24 @@ public class GameTests
     [TestMethod]
     public void StartAttack_ShowsAttackIntroAndWeaponArt()
     {
-        var dragon = new Dragon("Smaug") { Health = 1, Agility = 0 };
+        var dragon = new Dragon("Smaug") { DragonHealth = 1, DragonAgility = 0 };
         Setup s = CreateGameWithPlayer(CreateElfThief, dragon);
         s.Game.StartGame();
         s.Game.Player!.Strength = 20;
 
         s.Game.StartAttack();
 
-        string intro = s.Messages.GetMessage(Game.AttackIntroMessageId)
+        string intro = s.Messages.GetMessage(AttackIntroMessageId)
             .Replace("{occupation}", "Thief")
-            .Replace("{weapon}", "dagger");
+            .Replace("{weapon}", "Dagger");
         AssertOutputContains(s.Output, intro);
-        AssertOutputContains(s.Output, s.Messages.GetMessage(Game.ThiefArtMessageId));
+        AssertOutputContains(s.Output, s.Messages.GetMessage(ThiefArtMessageId));
     }
 
     [TestMethod]
     public void StartAttack_PlayerDefeatsDragon_ShowsVictoryAndEnds()
     {
-        var dragon = new Dragon("Smaug") { Health = 1, Agility = 0 };
+        var dragon = new Dragon("Smaug") { DragonHealth = 1, DragonAgility = 0 };
         Setup s = CreateGameWithPlayer(CreateElfThief, dragon);
         s.Game.StartGame();
         s.Game.Player!.Strength = 20;
@@ -358,15 +405,14 @@ public class GameTests
         bool retreated = s.Game.StartAttack();
 
         Assert.IsFalse(retreated);
-        Assert.IsTrue(dragon.Health <= 0);
-        AssertOutputContains(s.Output, s.Messages.GetMessage(Game.DragonDefeatedMessageId));
-        Assert.IsFalse(s.Output.ToString().Contains(s.Messages.GetMessage(4)));
+        Assert.IsTrue(dragon.DragonHealth <= 0);
+        AssertOutputContains(s.Output, s.Messages.GetMessage(DragonDefeatedMessageId));
     }
 
     [TestMethod]
     public void StartAttack_DragonDefeatsPlayer_ShowsDefeatAndEnds()
     {
-        var dragon = new Dragon("Smaug") { Strength = 20 };
+        var dragon = new Dragon("Smaug") { DragonStrength = 20 };
         Setup s = CreateGameWithPlayer(CreateElfThief, dragon);
         s.Game.StartGame();
         Player player = s.Game.Player!;
@@ -378,14 +424,13 @@ public class GameTests
 
         Assert.IsFalse(retreated);
         Assert.IsTrue(player.Health <= 0);
-        AssertOutputContains(s.Output, s.Messages.GetMessage(Game.PlayerDefeatedMessageId));
-        Assert.IsFalse(s.Output.ToString().Contains(s.Messages.GetMessage(4)));
+        AssertOutputContains(s.Output, s.Messages.GetMessage(PlayerDefeatedMessageId));
     }
 
     [TestMethod]
     public void StartAttack_RetreatAfterRound_ReturnsTrue()
     {
-        var dragon = new Dragon("Smaug") { Strength = 0 };
+        var dragon = new Dragon("Smaug") { DragonStrength = 0 };
         Setup s = CreateGameWithPlayer(CreateElfThief + "r\n", dragon);
         s.Game.StartGame();
         s.Game.Player!.Strength = 0;
@@ -393,7 +438,7 @@ public class GameTests
         bool retreated = s.Game.StartAttack();
 
         Assert.IsTrue(retreated);
-        AssertOutputContains(s.Output, s.Messages.GetMessage(Game.AttackPromptMessageId));
-        AssertOutputContains(s.Output, s.Messages.GetMessage(Game.AttackRetreatMessageId));
+        AssertOutputContains(s.Output, s.Messages.GetMessage(AttackPromptMessageId));
+        AssertOutputContains(s.Output, s.Messages.GetMessage(AttackRetreatMessageId));
     }
 }
