@@ -1,4 +1,3 @@
-
 namespace CYOA;
 
 public class Player
