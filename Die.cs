@@ -1,5 +1,5 @@
 namespace CYOA;
-public class Dice
+public class Die
 {
     private static readonly Random random = new Random();
 
