@@ -1,5 +1,4 @@
 namespace CYOA;
-
 public class Player
 {
     public string Name { get; set; }
@@ -9,7 +8,6 @@ public class Player
     public int Agility { get; set; }
     public int Health { get; set; }
     public Weapon Weapon { get; set; }
-
     public Player(
         string name,
         Race race,
@@ -27,27 +25,23 @@ public class Player
         Health = health;
         Weapon = weapon;
     }
-
-        public const int MaxDamageLabelId = 34;
-
     private static string Label(
         Messages? messages,
         int id,
         string fallback) =>
         messages == null ? fallback : messages.GetMessage(id);
-
     public string DisplayPlayertatistics(Messages? messages = null)
     {
         return
             "===== PLAYER STATISTICS =====\n" +
-            $"{Label(messages, NameLabelId, "Name")}: {Name}\n" +
-            $"{Label(messages, RaceLabelId, "Race")}: {Race}\n" +
-            $"{Label(messages, OccupationLabelId, "Occupation")}: {Occupation}\n" +
-            $"{Label(messages, StrengthLabelId, "Strength")}: {Strength}\n" +
-            $"{Label(messages, AgilityLabelId, "Agility")}: {Agility}\n" +
-            $"{Label(messages, HealthLabelId, "Health points")}: {Health}\n" +
-            $"{Label(messages, WeaponLabelId, "Weapon")}: {Weapon.type}\n" +
-            $"{Label(messages, MaxDamageLabelId, "Maximum Weapon Damage")}: {Weapon.maxDamage}\n" +
+            $"{Label(messages, 27, "Name")}: {Name}\n" +
+            $"{Label(messages, 28, "Race")}: {Race}\n" +
+            $"{Label(messages, 29, "Occupation")}: {Occupation}\n" +
+            $"{Label(messages, 30, "Strength")}: {Strength}\n" +
+            $"{Label(messages, 31, "Agility")}: {Agility}\n" +
+            $"{Label(messages, 32, "Health points")}: {Health}\n" +
+            $"{Label(messages, 33, "Weapon")}: {Weapon.type}\n" +
+            $"{Label(messages, 34, "Maximum Weapon Damage")}: {Weapon.maxDamage}\n" +
             $"{Weapon.asciiArt}\n" +
             "================================";
     }
