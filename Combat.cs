@@ -1,142 +1,104 @@
 using CYOA;
 public class Combat
 {
+    private readonly Messages _messages;
+    private readonly TextWriter _output;
+    public Combat(Messages? messages = null, TextWriter? output = null)
+    {
+        _messages = messages ?? new Messages();
+        _output = output ?? Console.Out;
+    }
     public bool CheckHit(int strength)
     {
-        int roll = Dice.Roll(20);
-
-        Console.WriteLine("Attack Roll: " + roll);
-
+        int roll = Die.Roll(20);
+        _output.WriteLine(_messages.FormatMessage(61, ("roll", roll)));
         return roll <= strength;
     }
-
     public bool CheckDefense(int agility)
     {
-        int roll = Dice.Roll(20);
-
-        Console.WriteLine("Defense Roll: " + roll);
-
+        int roll = Die.Roll(20);
+        _output.WriteLine(_messages.FormatMessage(62, ("roll", roll)));
         return roll <= agility;
     }
-
     public int CalculateDamage(int maxWeaponDamage)
     {
         if (maxWeaponDamage < 1)
         {
             throw new ArgumentOutOfRangeException(nameof(maxWeaponDamage));
         }
-
-        return Dice.Roll(maxWeaponDamage);
+        return Die.Roll(maxWeaponDamage);
     }
-
     public void DragonTaunt()
     {
-        string[] taunts =
-        {
-            "Ow! That actually stung a bit!",
-            "Impressive! You might actually be worth toasting...",
-            "That... was unexpected. But I assure you, it wont happen again.",
-            "Well, I'll be! you have more bite than I thought!"
-        };
-
-        int randomTaunt = Dice.Roll(taunts.Length) - 1;
-
-        Console.WriteLine(taunts[randomTaunt]);
+        int randomTaunt = 44 + Die.Roll(4) - 1;
+        _output.WriteLine(_messages.GetMessage(randomTaunt));
     }
-
     public void DragonSarcasticReply()
     {
-        string[] taunts =
-        {
-          "How adorable. You're actually trying to win.",
-          "You're still standing? Your persistence is almost as annoying as your weapon.",
-          "Still breating? You really are a stubborn, aren't you?",
-          "I'm genuinely impressed. Most people have the common sense to die much faster than this."
-        };
-
-        int randomTaunt = Dice.Roll(taunts.Length) - 1;
-
-        Console.WriteLine(taunts[randomTaunt]);
+        int randomTaunt = 57 + Die.Roll(4) - 1;
+        _output.WriteLine(_messages.GetMessage(randomTaunt));
     }
 
-    public int PlayerAttack(Character character, Dragon dragon)
+    //Player attempts to attack the dragon
+    public int PlayerAttack(Player character, Dragon dragon)
     {
-        //Character attempts to hit the dragon
         if (!CheckHit(character.Strength))
         {
-            Console.WriteLine($"You missed{dragon.DragonName}!");
-
+            _output.WriteLine(_messages.FormatMessage(35, ("dragonName", dragon.DragonName)));
             return dragon.DragonHealth;
         }
-
-        Console.WriteLine($"You hit {dragon.DragonName}!");
-
-        //Dragon attempts to defend
+        _output.WriteLine(_messages.FormatMessage(21, ("dragonName", dragon.DragonName)));
         if (CheckDefense(dragon.DragonAgility))
         {
-            Console.WriteLine($"{dragon.DragonName} successfully defends your attack");
-
+            _output.WriteLine(_messages.FormatMessage(22, ("dragonName", dragon.DragonName)));
             return dragon.DragonHealth;
         }
-
-        //Calculate damage
-        int damage = CalculateDamage(character.MaxWeaponDamage);
-
+        int damage = CalculateDamage(character.Weapon.maxDamage);
         dragon.DragonHealth -= damage;
-
-        Console.WriteLine($"The dragon failed to defend your attack. Your weapon delivers {damage} damage points. The dragon's Health is now {dragon.DragonHealth}");
-
+        _output.WriteLine(_messages.FormatMessage(23,
+            ("damage", damage),
+            ("healthPoints", dragon.DragonHealth)));
         if(dragon.DragonHealth <= 0)
         {
-            Console.WriteLine($"with the last word of 'Argg!' you have defeated the {dragon.DragonName}");
+            _output.WriteLine(_messages.GetMessage(24));
         }
         else
         {
             DragonTaunt();
         }
-
         return dragon.DragonHealth;
     }
 
-    public int DragonAttack(Dragon dragon, Character character)
+    //Dragon attempts to attack
+    public int DragonAttack(Dragon dragon, Player character)
     {
-        //Dragon attempts to hit Character
-        Console.WriteLine($"{dragon.DragonName} attacks!");
-
+        _output.WriteLine(_messages.FormatMessage(63, ("dragonName", dragon.DragonName)));
         if (!CheckHit(dragon.DragonStrength))
         {
-            Console.WriteLine($"{dragon.DragonName} missed you!");
-
+            _output.WriteLine(_messages.GetMessage(37));
             return character.Health;
         }
-
-        Console.WriteLine($"{dragon.DragonName} hits you!");
-
+        _output.WriteLine(_messages.FormatMessage(36, ("dragonName", dragon.DragonName)));
         if (CheckDefense(character.Agility))
         {
-            Console.WriteLine("You successfully defend the attack!");
-
+            _output.WriteLine(_messages.GetMessage(38));
             return character.Health;
         }
-
-        //Calculate damage
-        int damage = CalculateDamage(character.MaxWeaponDamage);
-
+        int damage = CalculateDamage(dragon.Weapon.maxDamage);
         character.Health -= damage;
-
-        Console.WriteLine($"The dragon's attack delivers {damage} damage points.");
-
-        Console.WriteLine($"Your health points are now {character.Health}.");
-
+        _output.WriteLine(_messages.FormatMessage(39,
+            ("damage", damage),
+            ("healthPoints", character.Health)));
         if (character.Health <= 0)
         {
-            Console.WriteLine($"With the last words of 'Oh no!', you have been defeated by {dragon.DragonName}!");
+            _output.WriteLine(_messages.GetMessage(40));
         }
         else
         {
             DragonSarcasticReply();
         }
-
         return character.Health;
     }
 }
+
+
