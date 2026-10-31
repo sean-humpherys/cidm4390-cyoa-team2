@@ -316,59 +316,26 @@ public class Game
         }
     }
 
-private void LoadDefaultMessages()
-{
-    string fileName = _messages.CurrentLanguage switch
+    private void LoadDefaultMessages()
     {
-        "English" => "English.json",
-        "French" => "French.json",
-        "Spanish" => "Spanish.json",
-        _ => "English.json"
-    };
-
-    string? filePath = FindMessageFile(fileName);
-
-    if (filePath == null)
-    {
-        throw new FileNotFoundException(
-            $"Could not find MessageFiles/{fileName}. " +
-            "Check that the MessageFiles folder is available.");
-    }
-
-    _messages.ReadJsonDictionary(filePath);
-}
-
-private static string? FindMessageFile(string fileName)
-{
-    string[] startingDirectories =
-    {
-        AppContext.BaseDirectory,
-        Directory.GetCurrentDirectory()
-    };
-
-    foreach (string startingDirectory in startingDirectories)
-    {
-        DirectoryInfo? directory = new DirectoryInfo(startingDirectory);
-
-        while (directory != null)
+        string fileName = _messages.CurrentLanguage switch
         {
-            string path = Path.Combine(
-                directory.FullName,
-                "MessageFiles",
-                fileName);
+            "English" => "English.json",
+            "French" => "French.json",
+            "Spanish" => "Spanish.json",
+            _ => "English.json"
+        };
 
-            if (File.Exists(path))
-            {
-                return path;
-            }
+        string? filePath = FindMessageFile(fileName);
 
-            directory = directory.Parent;
+        if (filePath == null)
+        {
+            throw new FileNotFoundException(
+                $"Could not find MessageFiles/{fileName}. " +
+                "Check that the MessageFiles folder is available.");
         }
-    }
 
-    return null;
-}
-        _messages.ReadDictionary(filePath);
+_messages.ReadDictionary(filePath);
     }
 
     private static string? FindMessageFile(string fileName)
@@ -385,7 +352,10 @@ private static string? FindMessageFile(string fileName)
 
             while (directory != null)
             {
-                string path = Path.Combine(directory.FullName, "MessageFiles", fileName);
+                string path = Path.Combine(
+                    directory.FullName,
+                    "MessageFiles",
+                    fileName);
 
                 if (File.Exists(path))
                 {
