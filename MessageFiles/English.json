@@ -60,5 +60,17 @@
   "63": "{dragonName} attacks!",
   "64": "You smirk as the attack misses you!",
   "65": "You grit your teeth after the hit!",
-  "66": "--- Dragon Statistics ---"
+  "66": "--- Dragon Statistics ---",
+  "67": "Human",
+  "68": "Elf",
+  "69": "Dwarf",
+  "70": "Halfling",
+  "71": "Fighter",
+  "72": "Magician",
+  "73": "Thief",
+  "74": "Archer",
+  "75": "Sword",
+  "76": "Staff",
+  "77": "Dagger",
+  "78": "Bow"
 }

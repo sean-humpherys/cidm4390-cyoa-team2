@@ -140,11 +140,11 @@ public class Game
         var combat = new Combat(_messages, _output);
 
         _output.WriteLine(Format(
-            _messages.GetMessage(20),
-            ("occupation", player.Occupation.ToString()),
-            ("weapon", player.Weapon.type)));
-
-        _output.WriteLine(_messages.GetMessage(ArtMessageIdFor(player.Occupation)));
+        _messages.GetMessage(20),
+        ("occupation", _messages.GetMessage(
+        OccupationMessageIdFor(player.Occupation))),
+        ("weapon", _messages.GetMessage(
+        WeaponMessageIdFor(player.Occupation)))));
 
         while (true)
         {
@@ -180,9 +180,11 @@ public class Game
 
     private void CreatePlayer(Die die)
     {
-        Race race = Enum.Parse<Race>(ReadChoice(13, Enum.GetNames<Race>()), true);
-        string name = ReadName();
-        Occupation occupation = Enum.Parse<Occupation>(ReadChoice(15, Enum.GetNames<Occupation>()), true);
+    Race race = ReadTranslatedEnum<Race>(13, 67);
+
+    string name = ReadName();
+
+    Occupation occupation = ReadTranslatedEnum<Occupation>(15, 71);
 
         Weapon weapon = WeaponFor(occupation);
         weapon.asciiArt = _messages.GetMessage(ArtMessageIdFor(occupation));
@@ -368,4 +370,76 @@ _messages.ReadDictionary(filePath);
 
         return null;
     }
+private TEnum ReadTranslatedEnum<TEnum>(
+    int promptMessageId,
+    int firstTranslationMessageId)
+    where TEnum : struct, Enum
+{
+    string[] names = Enum.GetNames<TEnum>();
+
+    while (true)
+    {
+        _output.WriteLine(_messages.GetMessage(promptMessageId));
+
+        for (int i = 0; i < names.Length; i++)
+        {
+            _output.WriteLine(
+                $"{i + 1}. {_messages.GetMessage(firstTranslationMessageId + i)}");
+        }
+
+        string? answer = _input.ReadLine();
+
+        if (answer == null)
+        {
+            throw new EndOfStreamException(
+                "Input ended before a valid choice was entered.");
+        }
+
+        answer = answer.Trim();
+
+        if (int.TryParse(answer, out int number) &&
+            number >= 1 && number <= names.Length)
+        {
+            return Enum.Parse<TEnum>(names[number - 1], true);
+        }
+
+        for (int i = 0; i < names.Length; i++)
+        {
+            string translated =
+                _messages.GetMessage(firstTranslationMessageId + i);
+
+            if (string.Compare(
+                answer,
+                translated,
+                CultureInfo.InvariantCulture,
+                CompareOptions.IgnoreCase | CompareOptions.IgnoreNonSpace) == 0 ||
+                string.Equals(
+                    answer,
+                    names[i],
+                    StringComparison.OrdinalIgnoreCase))
+            {
+                return Enum.Parse<TEnum>(names[i], true);
+            }
+        }
+
+        _output.WriteLine(_messages.GetMessage(52));
+    }
+}
+private static int OccupationMessageIdFor(Occupation occupation)
+    => occupation switch
+    {
+        Occupation.Fighter => 71,
+        Occupation.Magician => 72,
+        Occupation.Thief => 73,
+        _ => 74
+    };
+
+private static int WeaponMessageIdFor(Occupation occupation)
+    => occupation switch
+    {
+        Occupation.Fighter => 75,
+        Occupation.Magician => 76,
+        Occupation.Thief => 77,
+        _ => 78
+    };
 }
