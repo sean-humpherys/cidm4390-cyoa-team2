@@ -10,9 +10,9 @@
   "13": "¿Qué raza quieres que tenga tu personaje? Humano, Elfo, Enano o Mediano?",
   "14": "¿Cuál es el nombre de tu personaje?",
   "15": "¿Cuál es la ocupación de tu personaje? Luchador, Mago, Ladron o Arquero?",
-  "16": "A continuación, tiraremos los dados para la fuerza. Escribe 'roll'",
-  "17": "A continuación, tiraremos los dados para la agilidad. Escribe 'roll'",
-  "18": "A continuación, tiraremos los dados para los puntos de salud. Escribe 'roll'",
+  "16": "A continuación, tiraremos los dados para la fuerza. Escribe 'tirar'",
+  "17": "A continuación, tiraremos los dados para la agilidad. Escribe 'tirar'",
+  "18": "A continuación, tiraremos los dados para los puntos de salud. Escribe 'tirar'",
   "19": "¿Qué te gustaría hacer ahora? 1. Ver las estadísticas del personaje 2. Continuar con la aventura. Escribe 1 o 2.",
   "20": "Te preparas para atacar al dragón con tu arma. Como {occupation}, sacas tu {weapon}. Atacas.",
   "21": "Golpeas a {dragonName}.",
@@ -72,5 +72,6 @@
   "75": "Espada",
   "76": "Bastón",
   "77": "Daga",
-  "78": "Arco"
+  "78": "Arco",
+  "79": "tirar"
 }
