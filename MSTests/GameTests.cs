@@ -8,8 +8,11 @@ public class GameTests
     // Character creation answers for menu option 1: race, name, occupation, then three rolls.
     private const string CreateElfThiefAnswers = "1\nElf\nEmber\nThief\nroll\nroll\nroll\n";
 
+    // After creating the character, "2" picks "Proceed on an adventure" from the next menu.
+    private const string ProceedOnAdventure = "2\n";
+
     // StartGame goes on into the adventure after creating the character; "e" exits at the path choice.
-    private const string CreateElfThief = CreateElfThiefAnswers + "e\n";
+    private const string CreateElfThief = CreateElfThiefAnswers + ProceedOnAdventure + "e\n";
 
     private const int WelcomeMessageId = 5;
     private const int MenuMessageId = 6;
@@ -20,6 +23,7 @@ public class GameTests
     private const int MagicRingMessageId = 11;
     private const int StrengthLabelId = 30;
     private const int AgilityLabelId = 31;
+    private const int NextActionMenuMessageId = 19;
     private const int HealthLabelId = 32;
     private const int AttackIntroMessageId = 20;
     private const int AttackPromptMessageId = 25;
@@ -209,7 +213,7 @@ public class GameTests
     [TestMethod]
     public void StartGame_ChoiceOne_ChoicesIgnoreCase()
     {
-        Setup s = CreateGameWithPlayer("1\nDWARF\nEmber\narcher\nROLL\nRoll\nroll\ne\n");
+        Setup s = CreateGameWithPlayer("1\nDWARF\nEmber\narcher\nROLL\nRoll\nroll\n2\ne\n");
 
         s.Game.StartGame();
 
@@ -221,7 +225,7 @@ public class GameTests
     [TestMethod]
     public void StartGame_ChoiceOne_RejectsInvalidRaceAndEmptyName()
     {
-        Setup s = CreateGameWithPlayer("1\nOrc\nElf\n\nEmber\nThief\nroll\nroll\nroll\ne\n");
+        Setup s = CreateGameWithPlayer("1\nOrc\nElf\n\nEmber\nThief\nroll\nroll\nroll\n2\ne\n");
 
         s.Game.StartGame();
 
@@ -247,13 +251,50 @@ public class GameTests
     [TestMethod]
     public void StartGame_ChoiceOne_RunsAdventureAfterCreatingPlayer()
     {
-        Setup s = CreateGameWithPlayer(CreateElfThiefAnswers + "n\nr\n");
+        Setup s = CreateGameWithPlayer(CreateElfThiefAnswers + ProceedOnAdventure + "n\nr\n");
 
         s.Game.StartGame();
 
         AssertOutputContains(s.Output, s.Messages.GetMessage(PathPromptMessageId));
         AssertOutputContains(s.Output, s.Messages.GetMessage(NorthPathMessageId));
         AssertOutputContains(s.Output, s.Messages.GetMessage(RetreatMessageId));
+    }
+
+    [TestMethod]
+    public void StartGame_ChoiceOne_AsksWhatToDoNextAfterCreatingPlayer()
+    {
+        Setup s = CreateGameWithPlayer(CreateElfThief);
+
+        s.Game.StartGame();
+
+        string output = s.Output.ToString();
+        string nextMenu = s.Messages.GetMessage(NextActionMenuMessageId);
+        AssertOutputContains(s.Output, nextMenu);
+        Assert.IsTrue(output.IndexOf(nextMenu, StringComparison.Ordinal) <
+            output.IndexOf(s.Messages.GetMessage(PathPromptMessageId), StringComparison.Ordinal));
+    }
+
+    [TestMethod]
+    public void StartGame_NextMenuChoiceOne_ListsStatsAndAsksAgain()
+    {
+        Setup s = CreateGameWithPlayer(CreateElfThiefAnswers + "1\n" + ProceedOnAdventure + "e\n");
+
+        s.Game.StartGame();
+
+        AssertOutputContains(s.Output, s.Game.Player!.DisplayPlayerStatistics(s.Messages));
+        Assert.AreEqual(2, CountText(s.Output.ToString(), s.Messages.GetMessage(NextActionMenuMessageId)));
+        AssertOutputContains(s.Output, s.Messages.GetMessage(PathPromptMessageId));
+    }
+
+    [TestMethod]
+    public void StartGame_NextMenuInvalidChoice_ShowsInvalidMessageAndAsksAgain()
+    {
+        Setup s = CreateGameWithPlayer(CreateElfThiefAnswers + "x\n" + ProceedOnAdventure + "e\n");
+
+        s.Game.StartGame();
+
+        AssertOutputContains(s.Output, s.Messages.GetMessage(InvalidChoiceMessageId));
+        Assert.AreEqual(2, CountText(s.Output.ToString(), s.Messages.GetMessage(NextActionMenuMessageId)));
     }
 
     [TestMethod]

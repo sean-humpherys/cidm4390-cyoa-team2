@@ -67,6 +67,12 @@ public class Game
 
                     if (Player != null)
                     {
+                        // 1 lists the character stats and asks again; 2 goes on the adventure.
+                        while (ReadChoice(19, "1", "2") == "1")
+                        {
+                            _output.WriteLine(Player.DisplayPlayerStatistics(_messages));
+                        }
+
                         StartAdventure(() => StartAttack());
                     }
                     return;
