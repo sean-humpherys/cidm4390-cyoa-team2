@@ -1,4 +1,6 @@
+
 namespace CYOA;
+
 public class Player
 {
     public string Name { get; set; }
@@ -8,6 +10,7 @@ public class Player
     public int Agility { get; set; }
     public int Health { get; set; }
     public Weapon Weapon { get; set; }
+
     public Player(
         string name,
         Race race,
@@ -25,15 +28,17 @@ public class Player
         Health = health;
         Weapon = weapon;
     }
-    private static string Label(
-        Messages? messages,
-        int id,
-        string fallback) =>
-        messages == null ? fallback : messages.GetMessage(id);
+
+    private static string Label(Messages? messages, int id, string fallback)
+    {
+        return messages == null
+            ? fallback
+            : messages.GetMessage(id);
+    }
+
     public string DisplayPlayerStatistics(Messages? messages = null)
     {
-        return
-            "===== PlayerStatistics =====\n" +
+        return "===== PLAYER STATISTICS =====\n" +
             $"{Label(messages, 27, "Name")}: {Name}\n" +
             $"{Label(messages, 28, "Race")}: {Race}\n" +
             $"{Label(messages, 29, "Occupation")}: {Occupation}\n" +
