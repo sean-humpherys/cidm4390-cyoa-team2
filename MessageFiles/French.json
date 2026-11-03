@@ -9,10 +9,10 @@
   "12": "Voulez-vous battre en retraite ou attaquer ? Tapez 'r' pour battre en retraite. Tapez 'a' pour attaquer.",
   "13": "Quelle race de personnage voulez-vous être ? Humain, Elfe, Nain ou Halfelin ?",
   "14": "Quel est le nom de votre personnage ?",
-  "15": "Quelle est l'occupation de votre personnage ? Combattent, magicien, voleur ou archer ?",
-  "16": "Ensuite, nous allons lancer les dés pour la force. Tapez 'roll'",
-  "17": "Ensuite, nous allons lancer les dés pour l'agilité. Tapez 'roll'",
-  "18": "Ensuite, nous allons lancer les dés pour les points de santé. Tapez 'roll'",
+  "15": "Quelle est l'occupation de votre personnage ? Combattant, magicien, voleur ou archer ?",
+  "16": "Ensuite, nous allons lancer les dés pour la force. Tapez 'lancer'",
+  "17": "Ensuite, nous allons lancer les dés pour l'agilité. Tapez 'lancer'",
+  "18": "Ensuite, nous allons lancer les dés pour les points de santé. Tapez 'lancer'",
   "19": "Que voulez-vous faire ensuite ? 1. Afficher les statistiques du personnage 2. Partir à l'aventure. Tapez 1 ou 2.",
   "20": "Vous vous préparez à attaquer le dragon avec votre arme. En tant que {occupation}, vous sortez votre {weapon}. Vous attaquez.",
   "21": "Vous touchez {dragonName}.",
@@ -72,5 +72,6 @@
   "75": "Épée",
   "76": "Bâton",
   "77": "Dague",
-  "78": "Arc"
+  "78": "Arc",
+  "79": "lancer"
 }

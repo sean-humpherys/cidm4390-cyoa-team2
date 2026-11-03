@@ -198,13 +198,13 @@ public class Game
         bool isHalfling = race == Race.Halfling;
 
         // Strength: 1-20, then +1-4 (Human, Elf, Dwarf) or -1-4 (Halfling).
-        ReadChoice(16, "roll");
+        ReadChoiceIndex(16, new[] { "roll", _messages.GetMessage(79) });
         int strengthModifier = Die.Roll(4);
         int strength = Die.Roll(20) + (isHalfling ? -strengthModifier : strengthModifier);
         _output.WriteLine($"{_messages.GetMessage(30)}: {strength}");
 
         // Agility: 1-20, then +1-4 (Halfling, Elf). Human and Dwarf have no modifier.
-        ReadChoice(17, "roll");
+        ReadChoiceIndex(17, new[] { "roll", _messages.GetMessage(79) });
         int agility = Die.Roll(20);
         if (isHalfling || race == Race.Elf)
         {
@@ -213,7 +213,7 @@ public class Game
         _output.WriteLine($"{_messages.GetMessage(31)}: {agility}");
 
         // Health: 1-20, then add the strength modifier (Human, Elf, Dwarf). Halfling has none.
-        ReadChoice(18, "roll");
+        ReadChoiceIndex(18, new[] { "roll", _messages.GetMessage(79) });
         int health = Die.Roll(20) + (isHalfling ? 0 : strengthModifier);
         _output.WriteLine($"{_messages.GetMessage(32)}: {health}");
 
@@ -387,12 +387,6 @@ private TEnum ReadTranslatedEnum<TEnum>(
     {
         _output.WriteLine(_messages.GetMessage(promptMessageId));
 
-        for (int i = 0; i < names.Length; i++)
-        {
-            _output.WriteLine(
-                $"{i + 1}. {_messages.GetMessage(firstTranslationMessageId + i)}");
-        }
-
         string? answer = _input.ReadLine();
 
         if (answer == null)
@@ -402,12 +396,6 @@ private TEnum ReadTranslatedEnum<TEnum>(
         }
 
         answer = answer.Trim();
-
-        if (int.TryParse(answer, out int number) &&
-            number >= 1 && number <= names.Length)
-        {
-            return Enum.Parse<TEnum>(names[number - 1], true);
-        }
 
         for (int i = 0; i < names.Length; i++)
         {
